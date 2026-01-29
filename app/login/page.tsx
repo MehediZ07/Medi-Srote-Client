@@ -29,8 +29,7 @@ export default function Login() {
       
       setToken(token);
       setUser(user);
-      
-      // Redirect based on role
+
       const role = user.role;
       if (role === 'CUSTOMER') router.push('/shop');
       else if (role === 'SELLER') router.push('/seller/dashboard');
