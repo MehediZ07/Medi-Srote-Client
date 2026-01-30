@@ -4,20 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:3000/api/:path*',
-      },
-    ];
-  },
-  async headers() {
-    return [
-      {
-        source: '/api/:path*',
-        headers: [
-          {
-            key: 'Origin',
-            value: 'http://localhost:4000',
-          },
-        ],
+        destination: 'https://medi-store-backend-sigma.vercel.app/api/:path*',
       },
     ];
   },
