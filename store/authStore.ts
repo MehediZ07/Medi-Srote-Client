@@ -7,6 +7,8 @@ interface User {
   email: string;
   name: string;
   role: 'CUSTOMER' | 'SELLER' | 'ADMIN';
+  image?: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'BANNED';
 }
 
 interface AuthStore {

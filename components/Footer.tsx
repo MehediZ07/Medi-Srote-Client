@@ -53,7 +53,7 @@ export default function Footer() {
       <div className="bg-[#f2f2f2] px-4 md:px-10 py-[18px]">
         <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[#555] text-[14px] text-center md:text-left">
-            © 2024 MediStore. All rights reserved.
+            © 2026 MediStore. All rights reserved.
           </p>
 
           <div className="flex items-center gap-[18px] text-[#333] text-[16px] font-semibold">

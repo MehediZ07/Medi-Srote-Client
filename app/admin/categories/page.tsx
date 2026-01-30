@@ -10,6 +10,7 @@ import ProtectedRoute from '../../../components/ProtectedRoute';
 import api from '../../../lib/api';
 import { Category } from '../../../types/api';
 import { categorySchema, CategoryFormData } from '../../../lib/category-validation';
+import { FaPlus } from 'react-icons/fa6';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -135,9 +136,9 @@ export default function AdminCategories() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => openForm()}
-              className="bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] hover:from-blue-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg transition-all duration-200 shadow-lg font-semibold"
+              className="flex items-center justify-center bg-[#00B0F4] cursor-pointer text-white px-6 py-3 rounded-lg"
             >
-              Add New Category
+            <FaPlus className="mr-2" />  Add New Category
             </motion.button>
           </motion.div>
           

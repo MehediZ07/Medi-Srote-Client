@@ -7,8 +7,8 @@ import { motion } from 'framer-motion';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import api from '../../lib/api';
 import { AdminDashboardStats } from '../../types/admin';
-import { MdManageHistory, MdOutlineCategory } from 'react-icons/md';
-import { FaBox } from 'react-icons/fa6';
+import { MdManageHistory, MdOutlineCategory, MdOutlineCurrencyExchange } from 'react-icons/md';
+import { FaBox, FaUserTie } from 'react-icons/fa6';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -73,28 +73,6 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-blue-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            onClick={() => router.back()}
-            className="mb-6 flex items-center gap-2 text-[#00B0F4] font-medium"
-            {...fadeInUp}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back
-          </motion.button>
-
           <motion.h1 className="text-3xl font-bold mb-8" {...fadeInUp}>
             Admin Dashboard
           </motion.h1>
@@ -134,12 +112,12 @@ export default function AdminDashboard() {
             animate="animate"
           >
             {[
-              { title: 'Total Users', value: stats.totalUsers, icon: '👥' },
-              { title: 'Total Orders', value: stats.totalOrders, icon: '📦' },
+              { title: 'Total Users', value: stats.totalUsers, icon: <FaUserTie className="text-[#00B0F4]" /> },
+              { title: 'Total Orders', value: stats.totalOrders, icon: <FaBox className="text-[#00B0F4]" /> },
               {
                 title: 'Total Revenue',
                 value: `$${(stats.totalRevenue || 0).toFixed(2)}`,
-                icon: '💰',
+                icon: <MdOutlineCurrencyExchange className="text-[#00B0F4]" />,
               },
             ].map((item) => (
               <motion.div
@@ -156,7 +134,7 @@ export default function AdminDashboard() {
                       {item.value}
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-[#00B0F4] rounded-full flex items-center justify-center text-white text-xl">
+                  <div className="w-12 h-12 bg-[#00B0F4]/15 border border-[#00B0F4]/70 rounded-full flex items-center justify-center text-white text-xl">
                     {item.icon}
                   </div>
                 </div>

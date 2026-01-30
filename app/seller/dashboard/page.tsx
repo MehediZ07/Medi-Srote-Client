@@ -112,7 +112,7 @@ export default function SellerDashboard() {
                   <h3 className="text-lg font-semibold text-gray-700">Orders</h3>
                   <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-[#00B0F4] bg-clip-text text-transparent">{stats.totalOrders}</p>
                 </div>
-                <div className="w-12 h-12 bg-[#00B0F4] rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
                   <FaBox className="text-white text-xl" />
                 </div>
               </div>

@@ -9,6 +9,9 @@ import api from '../../../lib/api';
 import { SellerMedicine } from '../../../types/seller';
 import { Category } from '../../../types/api';
 import { medicineSchema, MedicineFormData } from '../../../lib/medicine-validation';
+import { FaPlus } from 'react-icons/fa6';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion'; 
 
 export default function SellerMedicines() {
   const [medicines, setMedicines] = useState<SellerMedicine[]>([]);
@@ -16,7 +19,12 @@ export default function SellerMedicines() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState<SellerMedicine | null>(null);
-
+  const router = useRouter();
+  const fadeInUp = {
+    initial: { opacity: 0, y: 60 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5 }
+  };
   const {
     register,
     handleSubmit,
@@ -112,13 +120,24 @@ export default function SellerMedicines() {
   return (
     <ProtectedRoute requiredRole="SELLER">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            onClick={() => router.back()}
+            className="mb-6 flex items-center text-[#00B0F4] hover:text-[#00B0F4] font-medium transition-colors"
+            {...fadeInUp}
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </motion.button> 
+        <div className="flex justify-between items-center mb-8">        
           <h1 className="text-3xl font-bold text-gray-900">My Medicines</h1>
           <button 
             onClick={() => openForm()}
-            className="bg-[#00B0F4] text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+            className="flex items-center justify-center bg-[#00B0F4] text-white px-6 py-3 rounded-lg cursor-pointer"
           >
-            Add New Medicine
+            <FaPlus className="mr-2" /> Add New Medicine
           </button>
         </div>
         

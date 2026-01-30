@@ -5,8 +5,9 @@ import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
 import { GiMedicines } from 'react-icons/gi';
-import { FaCartPlus } from 'react-icons/fa6';
+import { FaCartPlus, FaUser } from 'react-icons/fa6';
 import { HiMenu, HiX } from 'react-icons/hi';
+import { LuLogOut } from 'react-icons/lu';
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
@@ -22,8 +23,17 @@ export default function Navbar() {
     if (success) window.location.href = '/';
   };
 
+  const getInitials = (name: string | undefined) => {
+    if (!name) return '?';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].slice(0, 2).toUpperCase();
+  };
+
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
         <Link href="/" className="flex items-center gap-2 rounded-sm">
@@ -53,12 +63,11 @@ export default function Navbar() {
 
           {user?.role === 'CUSTOMER' && (
             <Link href="/cart" className="relative">
-              <div className="p-2 rounded-fullhover:bg-gray-100 text-md">
+              <div className="p-2 rounded-full hover:bg-gray-100">
                 <FaCartPlus className="text-2xl text-[#00B0F4]" />
               </div>
-
               {cartItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 border border-[#00B0F4] text-[#00B0F4] text-xs rounded-full px-1.5">
+                <span className="absolute -top-2 -right-2 bg-[#00B0F4] text-white text-xs font-medium rounded-full px-1.5 py-0.5 min-w-[18px] h-5 flex items-center justify-center">
                   {cartItemCount}
                 </span>
               )}
@@ -69,30 +78,56 @@ export default function Navbar() {
             <div className="relative hidden md:block">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center gap-2 hover:bg-gray-50 p-2 rounded-lg"
+                className="flex items-center gap-2.5 hover:bg-gray-50 p-1.5 rounded-lg transition-colors"
               >
-                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium">
-                  {user.name?.charAt(0)}
+                <div className="h-9 w-9 rounded-full overflow-hidden bg-gradient-to-br from-[#00B0F4]/20 to-blue-100 border-2 border-[#00B0F4]/30 shadow-sm flex items-center justify-center text-[#006B94] font-semibold text-lg relative">
+                  {user.image ? (
+                    <img
+                      src={user.image}
+                      alt={user.name || 'User'}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        (e.target as HTMLImageElement).parentElement!.innerHTML = getInitials(user.name);
+                      }}
+                    />
+                  ) : (
+                    getInitials(user.name)
+                  )}
                 </div>
-                <span className="text-sm text-gray-700">{user.name}</span>
+
+                <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                  {user.name?.split(' ')[0] || 'User'}
+                </span>
               </button>
 
               {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2">
-                  <Link href="/profile" className="block px-4 py-2 text-sm hover:bg-gray-50">Profile</Link>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                <div className="absolute right-0 mt-3 w-32 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
+                  <Link
+                    href="/profile"
+                    className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                    onClick={() => setShowDropdown(false)}
                   >
-                    Logout
+                    <span className="text-lg"><FaUser className="text-gray-700" /></span> Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setShowDropdown(false);
+                    }}
+                    className="block w-full text-left px-5 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
+                  >
+                    <span className="text-lg"><LuLogOut className="text-red-600" /></span> Logout
                   </button>
                 </div>
               )}
             </div>
           ) : (
             <div className="hidden md:flex items-center gap-3">
-              <Link href="/login" className="border border-[#00B0F4] text-[#00B0F4] px-4 py-2 rounded-lg text-sm">Login</Link>
-              <Link href="/register" className="bg-[#00B0F4] text-white px-4 py-2 rounded-lg text-sm">
+              <Link href="/login" className="border border-[#00B0F4] text-[#00B0F4] px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#00B0F4]/5 transition">
+                Login
+              </Link>
+              <Link href="/register" className="bg-[#00B0F4] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#0099d9] transition">
                 Register
               </Link>
             </div>
@@ -113,48 +148,58 @@ export default function Navbar() {
 
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t shadow-sm">
-          <div className="px-4 py-4 space-y-3">
-            <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700">Home</Link>
-            <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700">Shop</Link>
-            <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700">About</Link>
-            <Link href="/privacy" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700">Privacy</Link>
+          <div className="px-5 py-5 space-y-4">
+            <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block text-gray-800 font-medium">Home</Link>
+            <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="block text-gray-800 font-medium">Shop</Link>
+            <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="block text-gray-800 font-medium">About</Link>
+            <Link href="/privacy" onClick={() => setMobileMenuOpen(false)} className="block text-gray-800 font-medium">Privacy</Link>
 
             {user?.role === 'CUSTOMER' && (
-              <Link href="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700">
-                Orders
-              </Link>
+              <Link href="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-gray-800 font-medium">Orders</Link>
             )}
-
             {user?.role === 'SELLER' && (
-              <Link href="/seller/dashboard" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700">
-                Dashboard
-              </Link>
+              <Link href="/seller/dashboard" onClick={() => setMobileMenuOpen(false)} className="block text-gray-800 font-medium">Dashboard</Link>
             )}
-
             {user?.role === 'ADMIN' && (
-              <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700">
-                Admin
-              </Link>
+              <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block text-gray-800 font-medium">Admin</Link>
             )}
 
-            <hr />
+            <hr className="my-3 border-gray-200" />
 
             {user ? (
               <>
-                <Link href="/profile" className="block text-gray-700">Profile</Link>
+                <div className="flex items-center gap-3 py-2">
+                  <div className="h-10 w-10 rounded-full overflow-hidden bg-gradient-to-br from-[#00B0F4]/20 to-blue-100 border border-[#00B0F4]/30 flex items-center justify-center text-[#006B94] font-semibold text-xl">
+                    {user.image ? (
+                      <img
+                        src={user.image}
+                        alt={user.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => (e.currentTarget.style.display = 'none')}
+                      />
+                    ) : getInitials(user.name)}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{user.name}</p>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </div>
+                </div>
+
+                <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="block text-gray-800 font-medium py-1">Profile</Link>
                 <button
-                  onClick={handleLogout}
-                  className="block w-full text-left text-red-600"
+                  onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                  className="block w-full text-left text-red-600 font-medium py-1"
                 >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" className="block text-gray-700">Login</Link>
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block text-gray-800 font-medium py-2">Login</Link>
                 <Link
                   href="/register"
-                  className="block text-center bg-[#00B0F4] text-white py-2 rounded-lg"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-center bg-[#00B0F4] text-white py-3 rounded-xl font-medium mt-2"
                 >
                   Register
                 </Link>
