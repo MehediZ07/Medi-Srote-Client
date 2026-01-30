@@ -1,28 +1,72 @@
+import { FaFacebook, FaLinkedin } from "react-icons/fa6";
+import { FaXTwitter } from "react-icons/fa6";
+
 export default function Footer() {
   return (
-    <footer className="bg-gray-800 text-white">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-lg font-semibold mb-4">MediStore</h3>
-            <p className="text-gray-300">Your trusted online pharmacy</p>
+    <footer className="w-full bg-white border-t border-[#e0e0e0] text-gray-700 font-inter">
+      {/* Top Section */}
+      <div className="max-w-[1200px] mx-auto px-6 py-[80px] grid grid-cols-[2.5fr_1fr_1fr_1.5fr] gap-[60px]">
+        
+        {/* Brand */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <img src="/Medi-Store.png" alt="MediStore" className="h-10 w-auto" />
           </div>
-          <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-gray-300">
-              <li><a href="/shop" className="hover:text-white">Shop</a></li>
-              <li><a href="/about" className="hover:text-white">About</a></li>
-              <li><a href="/contact" className="hover:text-white">Contact</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-4">Contact</h4>
-            <p className="text-gray-300">Email: info@medistore.com</p>
-            <p className="text-gray-300">Phone: (555) 123-4567</p>
-          </div>
+          <p className="text-[15px] leading-[1.7]">
+            Your trusted online pharmacy delivering <br />
+            authentic medicines with care and reliability.
+          </p>
         </div>
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-          <p>&copy; 2024 MediStore. All rights reserved.</p>
+
+        {/* Navigation */}
+        <div>
+          <h4 className="text-gray-700 text-[16px] font-medium mb-5">
+            Navigation
+          </h4>
+          <ul className="space-y-[14px]">
+            <li><a href="/shop" className="hover:text-[#00B0F4]">Shop</a></li>
+            <li><a href="/about" className="hover:text-[#00B0F4]">About</a></li>
+            <li><a href="/privacy" className="hover:text-[#00B0F4]">Privacy</a></li>
+          </ul>
+        </div>
+
+        {/* Legal */}
+        <div>
+          <h4 className="text-gray-700 text-[16px] font-medium mb-5">
+            Legal
+          </h4>
+          <ul className="space-y-[14px]">
+            <li><a href="/privacy" className="hover:text-[#00B0F4]">Privacy Policy</a></li>
+            <li><a href="/terms" className="hover:text-[#00B0F4]">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        {/* Contact */}
+        <div>
+          <h4 className="text-gray-700 text-[16px] font-medium mb-5">
+            Contact Us
+          </h4>
+          <p className="text-[15px] leading-[1.8]">
+            Email: <span className="text-[#1da1f2]">info@medistore.com</span>
+            <br />
+            Phone: <span className="text-[#1da1f2]">+880 12345 67891</span>
+          </p>
+        </div>
+
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="bg-[#f2f2f2] px-10 py-[18px]">
+        <div className="w-[1200px] mx-auto flex items-center justify-between">
+          <p className="text-[#555] text-[14px]">
+            © 2024 MediStore. All rights reserved.
+          </p>
+
+          <div className="flex items-center gap-[18px] text-[#333] text-[16px] font-semibold">
+            <FaFacebook/>
+            <FaXTwitter />
+            <FaLinkedin />
+          </div>
         </div>
       </div>
     </footer>
