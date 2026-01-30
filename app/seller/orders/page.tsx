@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 import api from '../../../lib/api';
 import { SellerOrder } from '../../../types/seller';
@@ -29,7 +30,7 @@ export default function SellerOrders() {
       await api.patch(`/api/seller/orders/${orderId}/status`, { status });
       fetchOrders();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Failed to update status');
+      toast.error(error.response?.data?.message || 'Failed to update status');
     }
   };
 
@@ -48,7 +49,7 @@ export default function SellerOrders() {
     return (
       <ProtectedRoute requiredRole="SELLER">
         <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00B0F4]"></div>
         </div>
       </ProtectedRoute>
     );
@@ -89,8 +90,8 @@ export default function SellerOrders() {
             <tbody className="divide-y divide-gray-200">
               {orders.map(order => (
                 <tr key={order.id}>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">#{order.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{order.customerName}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">#{order.id.slice(-8)}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{order.customer.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     <div>
                       {order.orderItems?.map(item => (
@@ -100,7 +101,7 @@ export default function SellerOrders() {
                       ))}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">${order.totalAmount?.toFixed(2) || '0.00'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">${order.totalAmount.toFixed(2)}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(order.status)}`}>
                       {order.status}

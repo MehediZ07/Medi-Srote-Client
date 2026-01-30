@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import toast from 'react-hot-toast';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 import api from '../../../lib/api';
 import { SellerMedicine } from '../../../types/seller';
@@ -83,7 +84,7 @@ export default function SellerMedicines() {
       fetchMedicines();
       closeForm();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Operation failed');
+      toast.error(error.response?.data?.message || 'Operation failed');
     }
   };
 
@@ -94,7 +95,7 @@ export default function SellerMedicines() {
       await api.delete(`/api/seller/medicines/${id}`);
       fetchMedicines();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Delete failed');
+      toast.error(error.response?.data?.message || 'Delete failed');
     }
   };
 
@@ -102,7 +103,7 @@ export default function SellerMedicines() {
     return (
       <ProtectedRoute requiredRole="SELLER">
         <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00B0F4]"></div>
         </div>
       </ProtectedRoute>
     );
@@ -115,7 +116,7 @@ export default function SellerMedicines() {
           <h1 className="text-3xl font-bold text-gray-900">My Medicines</h1>
           <button 
             onClick={() => openForm()}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+            className="bg-[#00B0F4] text-white px-6 py-3 rounded-lg hover:bg-blue-700"
           >
             Add New Medicine
           </button>
@@ -174,7 +175,7 @@ export default function SellerMedicines() {
                   <td className="px-6 py-4 text-sm space-x-2">
                     <button 
                       onClick={() => openForm(medicine)}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-[#00B0F4] hover:text-blue-800"
                     >
                       Edit
                     </button>
@@ -192,7 +193,7 @@ export default function SellerMedicines() {
         </div>
         
         {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-screen overflow-y-auto">
               <h3 className="text-lg font-semibold mb-4">
                 {editingMedicine ? 'Edit Medicine' : 'Add New Medicine'}
@@ -203,7 +204,7 @@ export default function SellerMedicines() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
                   <input
                     {...register('name')}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    className="w-full p-[6px] border border-gray-300 rounded-lg"
                   />
                   {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
                 </div>
@@ -212,8 +213,8 @@ export default function SellerMedicines() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                   <textarea
                     {...register('description')}
-                    rows={3}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    rows={2}
+                    className="w-full p-[6px] border border-gray-300 rounded-lg"
                   />
                   {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
                 </div>
@@ -222,7 +223,7 @@ export default function SellerMedicines() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                   <select
                     {...register('categoryId')}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    className="w-full p-[6px] border border-gray-300 rounded-lg"
                   >
                     <option value="">Select Category</option>
                     {categories.map(category => (
@@ -239,7 +240,7 @@ export default function SellerMedicines() {
                       {...register('price', { valueAsNumber: true })}
                       type="number"
                       step="0.01"
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      className="w-full p-[6px] border border-gray-300 rounded-lg"
                     />
                     {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
                   </div>
@@ -249,7 +250,7 @@ export default function SellerMedicines() {
                     <input
                       {...register('stock', { valueAsNumber: true })}
                       type="number"
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      className="w-full p-[6px] border border-gray-300 rounded-lg"
                     />
                     {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock.message}</p>}
                   </div>
@@ -260,7 +261,7 @@ export default function SellerMedicines() {
                   <input
                     {...register('image')}
                     type="url"
-                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    className="w-full p-[6px] border border-gray-300 rounded-lg"
                   />
                   {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>}
                 </div>
@@ -276,7 +277,7 @@ export default function SellerMedicines() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+                    className="flex-1 bg-[#00B0F4] text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
                   >
                     {isSubmitting ? 'Saving...' : editingMedicine ? 'Update' : 'Create'}
                   </button>

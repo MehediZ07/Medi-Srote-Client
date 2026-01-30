@@ -1,11 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 import api from '../../../lib/api';
 import { AdminUser, Seller } from '../../../types/admin';
 
+const fadeInUp = {
+  initial: { opacity: 0, y: 60 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
+};
+
 export default function AdminUsers() {
+  const router = useRouter();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [sellers, setSellers] = useState<Seller[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,14 +52,14 @@ export default function AdminUsers() {
       await api.patch(`/api/admin/users/${userId}`, { status: newStatus });
       fetchUsers();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Failed to update user status');
+      toast.error(error.response?.data?.message || 'Failed to update user status');
     }
   };
 
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'CUSTOMER': return 'bg-blue-100 text-blue-800';
-      case 'SELLER': return 'bg-purple-100 text-purple-800';
+      case 'SELLER': return 'bg-blue-100 text-blue-800';
       case 'ADMIN': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -59,7 +69,7 @@ export default function AdminUsers() {
     return (
       <ProtectedRoute requiredRole="ADMIN">
         <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00B0F4]"></div>
         </div>
       </ProtectedRoute>
     );
@@ -67,8 +77,21 @@ export default function AdminUsers() {
 
   return (
     <ProtectedRoute requiredRole="ADMIN">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">User Management</h1>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            onClick={() => router.back()}
+            className="mb-6 flex items-center text-[#00B0F4] hover:text-[#00B0F4] font-medium transition-colors"
+            {...fadeInUp}
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </motion.button>
+          
+          <motion.h1 className="text-3xl font-bold text-gray-900 mb-8" {...fadeInUp}>User Management</motion.h1>
         
         <div className="mb-6">
           <div className="flex space-x-4">
@@ -76,7 +99,7 @@ export default function AdminUsers() {
               onClick={() => setActiveTab('users')}
               className={`px-4 py-2 rounded-lg ${
                 activeTab === 'users'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-[#00B0F4] text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
@@ -86,7 +109,7 @@ export default function AdminUsers() {
               onClick={() => setActiveTab('sellers')}
               className={`px-4 py-2 rounded-lg ${
                 activeTab === 'sellers'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-[#00B0F4] text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
@@ -225,6 +248,7 @@ export default function AdminUsers() {
             </table>
           </div>
         )}
+        </div>
       </div>
     </ProtectedRoute>
   );

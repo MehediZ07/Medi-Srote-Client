@@ -3,18 +3,40 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import api from '../../lib/api';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import { useCartStore } from '../../store/cartStore';
 import { checkoutSchema, CheckoutFormData } from '../../lib/checkout-validation';
 
+import {
+  HiLocationMarker,
+  HiCreditCard,
+  HiClipboardList,
+  HiShoppingCart
+} from 'react-icons/hi';
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 40 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
 export default function Checkout() {
   const router = useRouter();
   const { items, getTotalPrice, clear } = useCartStore();
-  const shippingCost = 5.00;
+
+  const shippingCost = 5;
   const totalPrice = getTotalPrice();
   const finalTotal = totalPrice + shippingCost;
-  
+
   const {
     register,
     handleSubmit,
@@ -22,19 +44,17 @@ export default function Checkout() {
     setError,
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
-    defaultValues: {
-      paymentMethod: 'cash_on_delivery',
-    },
+    defaultValues: { paymentMethod: 'cash_on_delivery' },
   });
 
   const onSubmit = async (data: CheckoutFormData) => {
     if (items.length === 0) {
-      alert('Your cart is empty');
+      toast.error('Your cart is empty');
       return;
     }
 
     try {
-      const orderData = {
+      await api.post('/api/orders', {
         items: items.map(item => ({
           medicineId: item.medicineId,
           quantity: item.quantity,
@@ -49,10 +69,8 @@ export default function Checkout() {
         },
         paymentMethod: data.paymentMethod,
         totalAmount: finalTotal
-      };
+      });
 
-      await api.post('/api/orders', orderData);
-      
       clear();
       router.push('/orders');
     } catch (error: any) {
@@ -65,16 +83,17 @@ export default function Checkout() {
   if (items.length === 0) {
     return (
       <ProtectedRoute requiredRole="CUSTOMER">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <p className="text-gray-600 mb-4">Your cart is empty</p>
-            <button 
+        <div className="min-h-screen flex items-center justify-center bg-blue-50 px-4">
+          <motion.div {...fadeInUp} className="text-center">
+            <HiShoppingCart className="mx-auto text-6xl text-[#00B0F4] mb-4" />
+            <p className="text-gray-600 mb-6">Your cart is empty</p>
+            <button
               onClick={() => router.push('/shop')}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+              className="bg-[#00B0F4] hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
             >
               Continue Shopping
             </button>
-          </div>
+          </motion.div>
         </div>
       </ProtectedRoute>
     );
@@ -82,148 +101,129 @@ export default function Checkout() {
 
   return (
     <ProtectedRoute requiredRole="CUSTOMER">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
-        
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold mb-4">Shipping Address</h3>
-                <div className="space-y-4">
-                  <div>
-                    <input 
-                      {...register('fullName')}
-                      placeholder="Full Name" 
-                      className="w-full p-3 border rounded-lg" 
-                    />
-                    {errors.fullName && (
-                      <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <input 
-                      {...register('address')}
-                      placeholder="Address" 
-                      className="w-full p-3 border rounded-lg" 
-                    />
-                    {errors.address && (
-                      <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
-                    )}
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <input 
-                        {...register('city')}
-                        placeholder="City" 
-                        className="p-3 border rounded-lg w-full" 
-                      />
-                      {errors.city && (
-                        <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
-                      )}
+      <div className="min-h-screen bg-blue-50">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <motion.h1 {...fadeInUp} className="text-2xl md:text-3xl font-bold mb-6">
+            Checkout
+          </motion.h1>
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+              <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-6">
+
+                <motion.div variants={fadeInUp} className="bg-white rounded-xl p-6 shadow">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-10 w-10 rounded-full bg-[#45CBFF] flex items-center justify-center">
+                      <HiLocationMarker className="text-white text-xl" />
                     </div>
-                    <div>
-                      <input 
-                        {...register('zipCode')}
-                        placeholder="ZIP Code" 
-                        className="p-3 border rounded-lg w-full" 
-                      />
-                      {errors.zipCode && (
-                        <p className="text-red-500 text-sm mt-1">{errors.zipCode.message}</p>
-                      )}
+                    <h3 className="font-semibold text-lg">Shipping Address</h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    <input {...register('fullName')} placeholder="Full Name" className="input" />
+                    {errors.fullName && <p className="error">{errors.fullName.message}</p>}
+
+                    <input {...register('address')} placeholder="Address" className="input" />
+                    {errors.address && <p className="error">{errors.address.message}</p>}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <input {...register('city')} placeholder="City" className="input" />
+                      <input {...register('zipCode')} placeholder="ZIP Code" className="input" />
                     </div>
+
+                    <input {...register('phone')} placeholder="Phone Number" className="input" />
                   </div>
-                  
-                  <div>
-                    <input 
-                      {...register('phone')}
-                      placeholder="Phone Number" 
-                      className="w-full p-3 border rounded-lg" 
-                    />
-                    {errors.phone && (
-                      <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
-                    )}
+                </motion.div>
+
+                <motion.div variants={fadeInUp} className="bg-white rounded-xl p-6 shadow">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-10 w-10 rounded-full bg-[#45CBFF] flex items-center justify-center">
+                      <HiCreditCard className="text-white text-xl" />
+                    </div>
+                    <h3 className="font-semibold text-lg">Payment Method</h3>
                   </div>
-                </div>
-              </div>
-              
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
-                <div className="space-y-4">
-                  <label className="flex items-center">
-                    <input 
+
+                  <label className="flex items-center gap-3 border p-3 rounded-lg cursor-pointer hover:bg-blue-50">
+                    <input
                       {...register('paymentMethod')}
-                      type="radio" 
-                      value="credit_card"
-                      className="mr-2" 
-                    />
-                    Credit Card
-                  </label>
-                  <label className="flex items-center">
-                    <input 
-                      {...register('paymentMethod')}
-                      type="radio" 
+                      type="radio"
                       value="cash_on_delivery"
-                      className="mr-2" 
                     />
-                    Cash on Delivery
+                    <span className="font-medium">Cash on Delivery</span>
                   </label>
-                </div>
-                {errors.paymentMethod && (
-                  <p className="text-red-500 text-sm mt-1">{errors.paymentMethod.message}</p>
-                )}
-              </div>
-            </div>
-            
-            <div>
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
-                
-                <div className="space-y-4 mb-6">
-                  {items.map(item => (
-                    <div key={item.medicineId} className="flex justify-between items-center">
-                      <div>
-                        <span className="font-medium">{item.name}</span>
-                        <span className="text-gray-600 ml-2">x{item.quantity}</span>
-                      </div>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                </motion.div>
+              </motion.div>
+
+              <motion.div variants={fadeInUp}>
+                <div className="bg-white rounded-xl p-6 shadow lg:sticky lg:top-24">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-10 w-10 rounded-full bg-[#45CBFF] flex items-center justify-center">
+                      <HiClipboardList className="text-white text-xl" />
                     </div>
-                  ))}
+                    <h3 className="font-semibold text-lg">Order Summary</h3>
+                  </div>
+
+                  <div className="space-y-3 mb-6">
+                    {items.map(item => (
+                      <div key={item.medicineId} className="flex justify-between text-sm">
+                        <span>{item.name} × {item.quantity}</span>
+                        <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="border-t pt-4 space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span>${totalPrice.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Shipping</span>
+                      <span>${shippingCost.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg">
+                      <span>Total</span>
+                      <span className="text-[#00B0F4]">${finalTotal.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  {errors.root && (
+                    <p className="text-red-500 text-sm mt-3">{errors.root.message}</p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full mt-6 bg-[#00B0F4] hover:bg-blue-700 text-white py-3 rounded-lg font-semibold disabled:opacity-50"
+                  >
+                    {isSubmitting ? 'Placing Order...' : 'Place Order'}
+                  </button>
                 </div>
-                
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span>${totalPrice.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Shipping:</span>
-                    <span>${shippingCost.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between font-semibold text-lg">
-                    <span>Total:</span>
-                    <span>${finalTotal.toFixed(2)}</span>
-                  </div>
-                </div>
-                
-                {errors.root && (
-                  <p className="text-red-500 text-sm mt-4">{errors.root.message}</p>
-                )}
-                
-                <button 
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {isSubmitting ? 'Placing Order...' : 'Place Order'}
-                </button>
-              </div>
+              </motion.div>
+
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
+
+      <style jsx>{`
+        .input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+        }
+        .input:focus {
+          outline: none;
+          border-color: #45cbff;
+          box-shadow: 0 0 0 2px rgba(69,203,255,0.3);
+        }
+        .error {
+          color: #ef4444;
+          font-size: 0.875rem;
+        }
+      `}</style>
     </ProtectedRoute>
   );
 }

@@ -26,12 +26,10 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <img src="/Medi-Store.png" alt="MediStore" className="h-10 w-auto" />
         </Link>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8 pl-12">
           <Link href="/" className="text-sm text-gray-600 hover:text-[#00B0F4]">Home</Link>
           <Link href="/shop" className="text-sm text-gray-600 hover:text-[#00B0F4]">Shop</Link>
@@ -51,11 +49,8 @@ export default function Navbar() {
           )}
         </nav>
 
-        {/* Right Section */}
         <div className="flex items-center gap-3">
 
-         
-          {/* Cart */}
           {user?.role === 'CUSTOMER' && (
             <Link href="/cart" className="relative">
               <div className="p-2 rounded-fullhover:bg-gray-100 text-md">
@@ -70,7 +65,6 @@ export default function Navbar() {
             </Link>
           )}
 
-          {/* Desktop User */}
           {user && (
             <div className="relative hidden md:block">
               <button
@@ -97,7 +91,6 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2"
@@ -111,7 +104,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t shadow-sm">
           <div className="px-4 py-4 space-y-3">

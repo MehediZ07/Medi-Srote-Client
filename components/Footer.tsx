@@ -4,10 +4,8 @@ import { FaXTwitter } from "react-icons/fa6";
 export default function Footer() {
   return (
     <footer className="w-full bg-white border-t border-[#e0e0e0] text-gray-700 font-inter">
-      {/* Top Section */}
       <div className="max-w-[1200px] mx-auto px-6 py-[80px] grid grid-cols-[2.5fr_1fr_1fr_1.5fr] gap-[60px]">
-        
-        {/* Brand */}
+
         <div>
           <div className="flex items-center gap-3 mb-4">
             <img src="/Medi-Store.png" alt="MediStore" className="h-10 w-auto" />
@@ -18,7 +16,6 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Navigation */}
         <div>
           <h4 className="text-gray-700 text-[16px] font-medium mb-5">
             Navigation
@@ -30,7 +27,6 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Legal */}
         <div>
           <h4 className="text-gray-700 text-[16px] font-medium mb-5">
             Legal
@@ -41,7 +37,6 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Contact */}
         <div>
           <h4 className="text-gray-700 text-[16px] font-medium mb-5">
             Contact Us
@@ -55,7 +50,6 @@ export default function Footer() {
 
       </div>
 
-      {/* Bottom Bar */}
       <div className="bg-[#f2f2f2] px-10 py-[18px]">
         <div className="w-[1200px] mx-auto flex items-center justify-between">
           <p className="text-[#555] text-[14px]">

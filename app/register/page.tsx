@@ -1,24 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Lottie from 'lottie-react';
+import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 import api from '../../lib/api';
 import { registerSchema, RegisterFormData } from '../../lib/validations';
+import { useAuthStore } from '../../store/authStore';
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 60 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
+};
+
+const slideInLeft = {
+  initial: { opacity: 0, x: -60 },
+  animate: { opacity: 1, x: 0 },
+  transition: { duration: 0.8 }
+};
 
 export default function Register() {
   const router = useRouter();
-  
-  const [registrationStatus, setRegistrationStatus] = useState<'form' | 'success' | 'error'>('form');
-  const [message, setMessage] = useState('');
-  
+  const { setUser, setToken } = useAuthStore();
+  const [animationData, setAnimationData] = useState<any>(null);
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setError,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -26,128 +40,164 @@ export default function Register() {
     },
   });
 
+  useEffect(() => {
+    fetch('/animation/form registration.json')
+      .then(res => res.json())
+      .then(setAnimationData)
+      .catch(console.error);
+  }, []);
+
   const onSubmit = async (data: RegisterFormData) => {
     try {
       await api.post('/api/auth/register', data);
-      setRegistrationStatus('success');
-      setMessage('Registration successful! You can now login to your account.');
+      toast.success('Account created! Logging you in...');
+
+      const loginResponse = await api.post('/api/auth/login', {
+        email: data.email,
+        password: data.password,
+      });
+
+      const { token, user } = loginResponse.data.data;
+
+      setToken(token);
+      setUser(user);
+
+      if (user.role === 'CUSTOMER') router.push('/shop');
+      else if (user.role === 'SELLER') router.push('/seller/dashboard');
+      else if (user.role === 'ADMIN') router.push('/admin');
+
     } catch (error: any) {
-      setRegistrationStatus('error');
-      setMessage(error.response?.data?.message || 'Registration failed');
+      toast.error(
+        error.response?.data?.message ||
+        'Registration failed. Please try again.'
+      );
     }
   };
 
-  if (registrationStatus === 'success') {
-    return (
-      <div className="max-w-md mx-auto px-4 py-16">
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-green-900 mb-4">Registration Successful!</h2>
-          <p className="text-gray-600 mb-6">{message}</p>
-          <div className="space-y-3">
-            <Link href="/login" className="block bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700">
-              Go to Login
-            </Link>
-            <button 
-              onClick={() => setRegistrationStatus('form')}
-              className="block w-full text-blue-600 hover:underline"
-            >
-              Register Another Account
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-md mx-auto px-4 py-16">
-      <div className="bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-center mb-8">Register</h1>
-        
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Full Name
-            </label>
-            <input
-              {...register('name')}
-              type="text"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-50 to-blue-50 flex items-center justify-center p-4">
+      <motion.div
+        className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div
+          className="hidden lg:flex flex-col items-center justify-center p-8"
+          {...slideInLeft}
+        >
+          <div className="w-96 h-96">
+            {animationData ? (
+              <Lottie animationData={animationData} loop />
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin h-16 w-16 border-b-2 border-[#00B0F4] rounded-full" />
+              </div>
             )}
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              {...register('email')}
-              type="email"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
+        </motion.div>
+
+        <motion.div className="flex items-center justify-center" {...fadeInUp}>
+          <div className="w-full max-w-md">
+            <div className="glass-card rounded-2xl p-8 shadow-2xl">
+              <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  Create Account
+                </h1>
+                <p className="text-gray-600">Join MediStore today</p>
+              </div>
+
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Full Name
+                  </label>
+                  <input
+                    {...register('name')}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-200"
+                    placeholder="Enter your name"
+                  />
+                  {errors.name && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.name.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Email
+                  </label>
+                  <input
+                    {...register('email')}
+                    type="email"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-200"
+                    placeholder="Enter your email"
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Account Type
+                  </label>
+                  <select
+                    {...register('role')}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-200"
+                  >
+                    <option value="CUSTOMER">Customer</option>
+                    <option value="SELLER">Seller</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <input
+                    {...register('password')}
+                    type="password"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-200"
+                    placeholder="Create password"
+                  />
+                  {errors.password && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  disabled={isSubmitting}
+                  className="w-full bg-[#00B0F4] hover:bg-blue-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-5 h-5 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Creating account...
+                    </>
+                  ) : (
+                    'Create Account'
+                  )}
+                </motion.button>
+              </form>
+
+              <p className="text-center text-sm mt-6">
+                Already have an account?{' '}
+                <Link href="/login" className="text-[#00B0F4] font-semibold">
+                  Sign In
+                </Link>
+              </p>
+            </div>
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Role
-            </label>
-            <select
-              {...register('role')}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="CUSTOMER">Customer</option>
-              <option value="SELLER">Seller</option>
-            </select>
-            {errors.role && (
-              <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>
-            )}
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              {...register('password')}
-              type="password"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-            )}
-          </div>
-          
-          {registrationStatus === 'error' && (
-            <p className="text-red-500 text-sm">{message}</p>
-          )}
-          
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-          >
-            {isSubmitting ? 'Registering...' : 'Register'}
-          </button>
-        </form>
-        
-        <p className="text-center mt-6 text-gray-600">
-          Already have an account?{' '}
-          <Link href="/login" className="text-blue-600 hover:underline">
-            Login here
-          </Link>
-        </p>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

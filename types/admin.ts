@@ -8,8 +8,8 @@ export interface AdminDashboardStats {
   revenueToday: number;
   recentOrders: Array<{
     id: string;
-    customerName: string;
-    sellerName: string;
+    address: string;
+    fullName: string;
     totalAmount: number;
     status: string;
     createdAt: string;
@@ -28,11 +28,45 @@ export interface AdminUser {
 
 export interface AdminOrder {
   id: string;
-  customerName: string;
-  sellerName: string;
-  orderItems: Array<{
-    medicine: { name: string };
+  fullName: string;
+  address: string;
+  city: string;
+  zipCode: string;
+  phone: string;
+  customer: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  childOrders?: Array<{
+    id: string;
+    status: string;
+    totalAmount: number;
+    seller: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    orderItems: Array<{
+      id: string;
+      medicine: {
+        id: string;
+        name: string;
+        price: number;
+      };
+      quantity: number;
+      price: number;
+    }>;
+  }>;
+  orderItems?: Array<{
+    id: string;
+    medicine: {
+      id: string;
+      name: string;
+      price: number;
+    };
     quantity: number;
+    price: number;
   }>;
   totalAmount: number;
   status: 'PLACED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';

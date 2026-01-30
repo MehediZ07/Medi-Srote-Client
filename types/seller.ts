@@ -34,13 +34,21 @@ export interface SellerMedicine {
 
 export interface SellerOrder {
   id: string;
-  customerName: string;
+  customer: {
+    id: string;
+    name: string;
+    email: string;
+  };
   orderItems: Array<{
     id: string;
     medicine: {
+      id: string;
       name: string;
+      image?: string;
+      price: number;
     };
     quantity: number;
+    price: number;
   }>;
   totalAmount: number;
   status: 'PLACED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';

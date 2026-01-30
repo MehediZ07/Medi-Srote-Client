@@ -1,12 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import api from '../../lib/api';
 import { Medicine, Category, MedicinesResponse } from '../../types/api';
 import Link from 'next/link';
 
-export default function Shop() {
+const fadeInUp = {
+  initial: { opacity: 0, y: 60 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+function ShopContent() {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,29 +104,32 @@ export default function Shop() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Shop Medicines</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="md:col-span-1">
-          <div className="bg-white p-6 rounded-lg shadow-md space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
-              <input
-                type="text"
-                value={filters.search}
-                onChange={(e) => updateFilters({ search: e.target.value })}
-                className="w-full p-2 border rounded-lg"
-                placeholder="Search medicines..."
-              />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <motion.h1 className="text-3xl font-bold text-gray-900 mb-8" {...fadeInUp}>Shop Medicines</motion.h1>
+        
+        <motion.div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100" {...fadeInUp}>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="md:col-span-2">
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={filters.search}
+                  onChange={(e) => updateFilters({ search: e.target.value })}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:border-[#45CBFF] focus:ring-2 focus:ring-blue-200 transition-all"
+                  placeholder="Search medicines..."
+                />
+              </div>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
               <select
                 value={filters.categories}
                 onChange={(e) => updateFilters({ categories: e.target.value })}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#45CBFF] focus:ring-2 focus:ring-blue-200 transition-all"
               >
                 <option value="">All Categories</option>
                 {categories.map(cat => (
@@ -120,97 +138,108 @@ export default function Shop() {
               </select>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
-              <div className="flex space-x-2">
-                <input
-                  type="number"
-                  placeholder="Min"
-                  value={filters.minPrice}
-                  onChange={(e) => updateFilters({ minPrice: e.target.value })}
-                  className="w-full p-2 border rounded-lg"
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={filters.maxPrice}
-                  onChange={(e) => updateFilters({ maxPrice: e.target.value })}
-                  className="w-full p-2 border rounded-lg"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={filters.inStock}
-                  onChange={(e) => updateFilters({ inStock: e.target.checked })}
-                  className="mr-2"
-                />
-                In Stock Only
-              </label>
+            <div className="flex space-x-2">
+              <input
+                type="number"
+                placeholder="Min Price"
+                value={filters.minPrice}
+                onChange={(e) => updateFilters({ minPrice: e.target.value })}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#45CBFF] focus:ring-2 focus:ring-blue-200 transition-all"
+              />
+              <input
+                type="number"
+                placeholder="Max Price"
+                value={filters.maxPrice}
+                onChange={(e) => updateFilters({ maxPrice: e.target.value })}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#45CBFF] focus:ring-2 focus:ring-blue-200 transition-all"
+              />
             </div>
           </div>
-        </div>
-        
-        <div className="md:col-span-3">
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={filters.inStock}
+                onChange={(e) => updateFilters({ inStock: e.target.checked })}
+                className="mr-2 text-[#00B0F4] rounded focus:ring-[#45CBFF]"
+              />
+              <span className="text-sm font-medium text-gray-700">In Stock Only</span>
+            </label>
+            
+            <div className="text-sm text-gray-600">
+              Showing {medicines.length} of {total} medicines
             </div>
-          ) : (
-            <>
-              <div className="mb-4 text-gray-600">
-                Showing {medicines.length} of {total} medicines
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                {medicines.map(medicine => (
-                  <div key={medicine.id} className="bg-white p-6 rounded-lg shadow-md">
-                    <div className="h-48 bg-gray-200 rounded mb-4">
-                      {medicine.image && (
-                        <img src={medicine.image} alt={medicine.name} className="w-full h-full object-cover rounded" />
-                      )}
-                    </div>
-                    <h3 className="font-semibold mb-2">{medicine.name}</h3>
-                    <p className="text-gray-600 text-sm mb-2 line-clamp-2">{medicine.description}</p>
-                    <p className="text-sm text-gray-500 mb-2">by {medicine.seller.name}</p>
-                    <p className="text-lg font-bold text-blue-600 mb-2">${medicine.price}</p>
-                    <p className="text-sm text-gray-500 mb-4">
-                      Stock: {medicine.stock > 0 ? medicine.stock : 'Out of stock'}
-                    </p>
+          </div>
+        </motion.div>
+
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="rounded-full h-12 w-12 border-b-2 border-[#00B0F4]"
+            ></motion.div>
+          </div>
+        ) : (
+          <>
+            <motion.div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8" variants={staggerContainer} initial="initial" animate="animate">
+              {medicines.map(medicine => (
+                <motion.div key={medicine.id} variants={fadeInUp} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                  <div className="h-48 bg-gray-200 rounded-lg mb-4 overflow-hidden">
+                    {medicine.image && (
+                      <img src={medicine.image} alt={medicine.name} className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                  <h3 className="font-semibold mb-2 text-gray-900">{medicine.name}</h3>
+                  <p className="text-gray-600 text-sm mb-2 line-clamp-2">{medicine.description}</p>
+                  <p className="text-sm text-gray-500 mb-2">by {medicine.seller.name}</p>
+                  <p className="text-lg font-bold bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] bg-clip-text text-transparent mb-2">${medicine.price}</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Stock: {medicine.stock > 0 ? medicine.stock : 'Out of stock'}
+                  </p>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Link
                       href={`/shop/${medicine.id}`}
-                      className="block w-full text-center bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                      className="block w-full text-center bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] hover:from-blue-700 hover:to-blue-700 text-white py-2 px-4 rounded-lg transition-all duration-200 font-semibold shadow-lg"
                     >
                       View Details
                     </Link>
-                  </div>
+                  </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {totalPages > 1 && (
+              <motion.div className="flex justify-center space-x-2" {...fadeInUp}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <motion.button
+                    key={page}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => changePage(page)}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      page === filters.page
+                        ? 'bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] text-white shadow-lg'
+                        : 'bg-white text-gray-700 hover:bg-blue-50 border border-gray-200'
+                    }`}
+                  >
+                    {page}
+                  </motion.button>
                 ))}
-              </div>
-              
-              {totalPages > 1 && (
-                <div className="flex justify-center space-x-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                    <button
-                      key={page}
-                      onClick={() => changePage(page)}
-                      className={`px-4 py-2 rounded ${
-                        page === filters.page
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </div>
+              </motion.div>
+            )}
+          </>
+        )}
       </div>
     </div>
+  );
+}
+
+export default function Shop() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-16"><div className="rounded-full h-12 w-12 border-b-2 border-[#00B0F4] animate-spin"></div></div>}>
+      <ShopContent />
+    </Suspense>
   );
 }

@@ -11,12 +11,26 @@ export interface OrderItem {
   price: number;
 }
 
-export interface Order {
+export interface SellerOrder {
   id: string;
   status: 'PLACED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   totalAmount: number;
   createdAt: string;
   orderItems: OrderItem[];
+  seller: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export interface Order {
+  id: string;
+  status: 'PLACED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+  totalAmount: number;
+  createdAt: string;
+  orderItems?: OrderItem[];
+  childOrders?: SellerOrder[];
   fullName: string;
   address: string;
   city: string;

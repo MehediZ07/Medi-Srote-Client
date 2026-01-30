@@ -28,7 +28,6 @@ const staggerContainer = {
 export default function Home() {
   return (
     <div className="overflow-hidden">
-      {/* HERO SECTION */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -63,7 +62,6 @@ export default function Home() {
 
       <HomeQuickProducts />
 
-      {/* STATS */}
       <section className="py-20 bg-[#45CBFF]/20 backdrop-blur-md texst-gray-600">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div

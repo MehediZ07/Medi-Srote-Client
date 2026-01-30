@@ -21,7 +21,6 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
   useEffect(() => {
     if (!hydrated) return;
     
-    // Only check auth if we don't have a user from persistence
     if (!user) {
       checkAuth();
     }
@@ -45,7 +44,7 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
   if (!hydrated || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#00B0F4]"></div>
       </div>
     );
   }
