@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';  // ← added useEffect & useRef
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
 import { GiMedicines } from 'react-icons/gi';
@@ -15,6 +15,8 @@ export default function Navbar() {
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const cartItemCount = getTotalItems();
 
@@ -31,6 +33,19 @@ export default function Navbar() {
     }
     return parts[0].slice(0, 2).toUpperCase();
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showDropdown && dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-200">
@@ -102,7 +117,10 @@ export default function Navbar() {
               </button>
 
               {showDropdown && (
-                <div className="absolute right-0 mt-3 w-32 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
+                <div 
+                  ref={dropdownRef}
+                  className="absolute right-0 mt-3 w-32 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50"
+                >
                   <Link
                     href="/profile"
                     className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
