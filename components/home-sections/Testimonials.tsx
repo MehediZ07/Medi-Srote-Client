@@ -3,7 +3,6 @@
 import Marquee from "react-fast-marquee";
 import TestimonialCard from "./TestimonialCard";
 import { testimonials } from "../../data/testimonials";
-
 export default function Testimonials() {
   return (
     <section className="bg-white max-w-[1200px] mx-auto py-8 overflow-hidden section-fade-x">

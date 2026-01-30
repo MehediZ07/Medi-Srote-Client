@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Medicine, MedicinesResponse } from '../../types/api';
 import api from '../../lib/api';
-import Link from 'next/link'; 
+import Link from 'next/link';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 24 },
@@ -29,7 +29,7 @@ const HomeQuickProducts: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (products.length === 0) return; 
+    if (products.length === 0) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % products.length);
@@ -40,8 +40,9 @@ const HomeQuickProducts: React.FC = () => {
 
   const getCardsToShow = () => {
     if (typeof window === 'undefined') return 4;
-    if (window.innerWidth < 640) return 1;
-    if (window.innerWidth < 1024) return 2;
+    if (window.innerWidth < 640) return 1; 
+    if (window.innerWidth < 920) return 2;
+    if (window.innerWidth < 1024) return 3;
     return 4;
   };
 
@@ -72,7 +73,7 @@ const HomeQuickProducts: React.FC = () => {
             {products.map((product) => (
               <div
                 key={product.id}
-                className={`flex-shrink-0 w-[calc(100%/${cardsToShow})] px-2`}
+                className={`flex-shrink-0 w-full sm:w-[calc(50%)] md:w-[calc(33.33%)] lg:w-[calc(25%)] px-2`} // Adjusted width based on screen size
               >
                 <Link href={`/shop/${product.id}`} passHref>
                   <div className="relative aspect-[5/3] rounded-xl overflow-hidden cursor-pointer transition-transform">

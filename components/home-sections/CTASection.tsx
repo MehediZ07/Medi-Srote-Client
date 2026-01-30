@@ -31,9 +31,9 @@ export default function CTASection() {
             Safe & Reliable Healthcare at Your Doorstep
           </h2>
 
-          <button className="mt-10 px-10 py-4 rounded-full bg-[#00B0F4] text-white text-base font-medium hover:opacity-90 transition">
+          <a href="/shop" className="mt-10 px-10 py-4 rounded-full bg-[#00B0F4] text-white text-base font-medium hover:opacity-90 transition">
             Shop Medicines Now
-          </button>
+          </a>
         </div>
       </div>
     </section>

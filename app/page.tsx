@@ -62,10 +62,10 @@ export default function Home() {
 
       <HomeQuickProducts />
 
-      <section className="py-20 bg-[#45CBFF]/20 backdrop-blur-md texst-gray-600">
+      <section className="py-12 md:py-20 bg-[#45CBFF]/20 backdrop-blur-md text-gray-600">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center"
             variants={staggerContainer}
             initial="initial"
             whileInView="animate"
@@ -102,9 +102,9 @@ function Feature({ icon, title, desc }: { icon: string; title: string; desc: str
 
 function Stat({ number, label }: { number: string; label: string }) {
   return (
-    <motion.div variants={fadeInUp} className="text-center">
-      <div className="text-4xl font-bold mb-2">{number}</div>
-      <div className="text-lg opacity-90">{label}</div>
+    <motion.div variants={fadeInUp} className="text-center py-4">
+      <div className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">{number}</div>
+      <div className="text-sm md:text-base lg:text-lg opacity-90">{label}</div>
     </motion.div>
   );
 }

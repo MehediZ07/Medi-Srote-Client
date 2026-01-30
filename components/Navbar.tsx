@@ -26,8 +26,8 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
-        <Link href="/" className="flex items-center gap-2">
-          <img src="/Medi-Store.png" alt="MediStore" className="h-10 w-auto" />
+        <Link href="/" className="flex items-center gap-2 rounded-sm">
+          <img src="/Medi-Store.png" alt="MediStore" className="h-10 w-auto rounded-sm" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8 pl-12">
@@ -65,7 +65,7 @@ export default function Navbar() {
             </Link>
           )}
 
-          {user && (
+          {user ? (
             <div className="relative hidden md:block">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
@@ -88,6 +88,13 @@ export default function Navbar() {
                   </button>
                 </div>
               )}
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center gap-3">
+              <Link href="/login" className="border border-[#00B0F4] text-[#00B0F4] px-4 py-2 rounded-lg text-sm">Login</Link>
+              <Link href="/register" className="bg-[#00B0F4] text-white px-4 py-2 rounded-lg text-sm">
+                Register
+              </Link>
             </div>
           )}
 

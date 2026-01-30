@@ -151,26 +151,26 @@ const Categories: React.FC = () => {
           <div className="relative">
             <button
               className="
-                absolute -left-12 top-1/2 -translate-y-1/2 z-10
+                absolute -left-6 md:-left-12 top-1/2 -translate-y-1/2 z-10
                 text-[#45CBFF]/50 hover:text-[#45CBFF]/90
                 transition-colors
               "
               id="category-prev"
               aria-label="Previous"
             >
-              <IoIosArrowDropleft size={42} />
+              <IoIosArrowDropleft size={32} className="md:w-[42px] md:h-[42px]" />
             </button>
 
             <button
               className="
-                absolute -right-12 top-1/2 -translate-y-1/2 z-10
+                absolute -right-6 md:-right-12 top-1/2 -translate-y-1/2 z-10
                 text-[#45CBFF]/50 hover:text-[#45CBFF]/90
                 transition-colors
               "
               id="category-next"
               aria-label="Next"
             >
-              <IoIosArrowDropright size={42} />
+              <IoIosArrowDropright size={32} className="md:w-[42px] md:h-[42px]" />
             </button>
 
             <Swiper
