@@ -71,9 +71,7 @@ export default function OrderDetail({ params }: Props) {
     setValue('rating', rating);
   };
 
-  const cancelOrder = async () => {
-    if (!confirm('Are you sure you want to cancel this order?')) return;
-    
+  const cancelOrder = async () => {   
     try {
       await api.patch(`/api/orders/${orderId}/cancel`);
       fetchOrder(orderId);
