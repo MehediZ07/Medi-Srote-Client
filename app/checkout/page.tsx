@@ -128,11 +128,20 @@ export default function Checkout() {
                     {errors.address && <p className="error">{errors.address.message}</p>}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <input {...register('city')} placeholder="City" className="input" />
-                      <input {...register('zipCode')} placeholder="ZIP Code" className="input" />
+                      <div>
+                        <input {...register('city')} placeholder="City" className="input" />
+                        {errors.city && <p className="error">{errors.city.message}</p>}
+                      </div>
+                      <div>
+                        <input {...register('zipCode')} placeholder="ZIP Code" className="input" />
+                        {errors.zipCode && <p className="error">{errors.zipCode.message}</p>}
+                      </div>
                     </div>
 
-                    <input {...register('phone')} placeholder="Phone Number" className="input" />
+                    <div>
+                      <input {...register('phone')} placeholder="Phone Number" className="input" />
+                      {errors.phone && <p className="error">{errors.phone.message}</p>}
+                    </div>
                   </div>
                 </motion.div>
 
