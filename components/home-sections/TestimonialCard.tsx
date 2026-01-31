@@ -3,6 +3,7 @@ type Props = {
   reviews: string;
   time: string;
   text: string;
+  image: string;
 };
 
 export default function TestimonialCard({
@@ -10,6 +11,7 @@ export default function TestimonialCard({
   reviews,
   time,
   text,
+  image,
 }: Props) {
   return (
     <div className="w-[360px] h-[220px] bg-white rounded-2xl border-2 border-gray-100 px-6 py-5 mx-4 my-2">
@@ -25,7 +27,14 @@ export default function TestimonialCard({
       </p>
 
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gray-200" />
+        <img 
+          src={image} 
+          alt={name}
+          className="w-10 h-10 rounded-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = '/default-avatar.png';
+          }}
+        />
         <div>
           <p className="font-medium text-gray-800">{name}</p>
           <p className="text-xs text-gray-400">{reviews}</p>
