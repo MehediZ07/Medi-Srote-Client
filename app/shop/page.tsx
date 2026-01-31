@@ -185,28 +185,65 @@ function ShopContent() {
           <>
             <motion.div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8" variants={staggerContainer} initial="initial" animate="animate">
               {medicines.map(medicine => (
-                <motion.div key={medicine.id} variants={fadeInUp} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                  <div className="h-48 bg-gray-200 rounded-lg mb-4 overflow-hidden">
-                    {medicine.image && (
-                      <img src={medicine.image} alt={medicine.name} className="w-full h-full object-cover" />
-                    )}
-                  </div>
-                  <h3 className="font-semibold mb-2 text-gray-900">{medicine.name}</h3>
-                  <p className="text-gray-600 text-sm mb-2 line-clamp-2">{medicine.description}</p>
-                  <p className="text-sm text-gray-500 mb-2">by {medicine.seller.name}</p>
-                  <p className="text-lg font-bold bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] bg-clip-text text-transparent mb-2">${medicine.price}</p>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Stock: {medicine.stock > 0 ? medicine.stock : 'Out of stock'}
+              <motion.div
+                key={medicine.id}
+                variants={fadeInUp}
+                whileHover={{ y: -2 }}
+                className="group bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col"
+              >
+                <div className="h-48 bg-white rounded-t-lg overflow-hidden">
+                  {medicine.image && (
+                    <img
+                      src={medicine.image}
+                      alt={medicine.name}
+                      className="w-full h-full object-contain"
+                    />
+                  )}
+                </div>
+                
+                <div className="flex flex-col flex-1 p-5">
+                  <h3 className="text-base font-semibold text-gray-900 mb-1">
+                    {medicine.name}
+                  </h3>
+                
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                    {medicine.description}
                   </p>
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Link
-                      href={`/shop/${medicine.id}`}
-                      className="block w-full text-center bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] hover:from-blue-700 hover:to-blue-700 text-white py-2 px-4 rounded-lg transition-all duration-200 font-semibold shadow-lg"
-                    >
-                      View Details
-                    </Link>
-                  </motion.div>
-                </motion.div>
+                
+                  <p className="text-xs text-gray-500 mb-4">
+                    Listed by <span className="font-medium text-gray-700">{medicine.seller.name}</span>
+                  </p>
+                
+                  <div className="mt-auto border-t border-gray-200 pt-1">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-lg font-semibold text-[#00B0F4]">
+                        ${medicine.price}
+                      </span>
+                
+                      <span
+                        className={`text-xs px-2 py-1 rounded-md font-medium ${
+                          medicine.stock > 0
+                            ? "bg-green-50 text-green-600"
+                            : "bg-red-50 text-red-600"
+                        }`}
+                      >
+                        {medicine.stock > 0 ? `Stock: ${medicine.stock}` : "Out of stock"}
+                      </span>
+                    </div>
+                      
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                      <Link
+                        href={`/shop/${medicine.id}`}
+                        className="block w-full text-center bg-gradient-to-r from-[#00B0F4] to-[#00B0F4]
+                          hover:from-blue-700 hover:to-blue-700
+                          text-white py-2.5 rounded-lg font-semibold transition-all shadow-sm"
+                      >
+                        View Details
+                      </Link>
+                    </motion.div>
+                  </div>
+                </div>
+              </motion.div>
               ))}
             </motion.div>
 

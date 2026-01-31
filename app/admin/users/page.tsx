@@ -148,7 +148,22 @@ export default function AdminUsers() {
                   <tr key={user.id}>
                     <td className="px-6 py-4">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gray-300 rounded-full mr-4"></div>
+                        {user.image ? (
+                          <img 
+                            src={user.image} 
+                            alt={user.name}
+                            className="w-10 h-10 rounded-full mr-4 object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = '/default-avatar.png';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-300 rounded-full mr-4 flex items-center justify-center">
+                            <span className="text-gray-600 text-sm font-medium">
+                              {user.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        )}
                         <div>
                           <p className="font-medium">{user.name}</p>
                           <p className="text-sm text-gray-600">ID: {user.id}</p>
@@ -222,7 +237,22 @@ export default function AdminUsers() {
                   <tr key={seller.id}>
                     <td className="px-6 py-4">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gray-300 rounded-full mr-4"></div>
+                        {seller.image ? (
+                          <img 
+                            src={seller.image} 
+                            alt={seller.name}
+                            className="w-10 h-10 rounded-full mr-4 object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = '/default-avatar.png';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-300 rounded-full mr-4 flex items-center justify-center">
+                            <span className="text-gray-600 text-sm font-medium">
+                              {seller.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        )}
                         <div>
                           <p className="font-medium">{seller.name}</p>
                           <p className="text-sm text-gray-600">ID: {seller.id}</p>

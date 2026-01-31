@@ -20,6 +20,7 @@ export interface AdminUser {
   id: string;
   name: string;
   email: string;
+  image?: string;
   role: 'CUSTOMER' | 'SELLER' | 'ADMIN';
   status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
   emailVerified: boolean;
@@ -77,6 +78,7 @@ export interface Seller {
   id: string;
   name: string;
   email: string;
+  image?: string;
   status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
   emailVerified: boolean;
   totalProducts: number;

@@ -11,7 +11,7 @@ import { Category } from '../../../types/api';
 import { medicineSchema, MedicineFormData } from '../../../lib/medicine-validation';
 import { FaPlus } from 'react-icons/fa6';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion'; 
+import { motion } from 'framer-motion';
 
 export default function SellerMedicines() {
   const [medicines, setMedicines] = useState<SellerMedicine[]>([]);
@@ -19,12 +19,15 @@ export default function SellerMedicines() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState<SellerMedicine | null>(null);
+
   const router = useRouter();
+
   const fadeInUp = {
     initial: { opacity: 0, y: 60 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.5 }
   };
+
   const {
     register,
     handleSubmit,
@@ -86,8 +89,10 @@ export default function SellerMedicines() {
     try {
       if (editingMedicine) {
         await api.put(`/api/seller/medicines/${editingMedicine.id}`, data);
+        toast.success('Medicine updated successfully');
       } else {
         await api.post('/api/seller/medicines', data);
+        toast.success('Medicine created successfully');
       }
       fetchMedicines();
       closeForm();
@@ -96,14 +101,13 @@ export default function SellerMedicines() {
     }
   };
 
-  const deleteMedicine = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this medicine?')) return;
-    
+  const deleteMedicine = async (id: string, name: string) => {
     try {
       await api.delete(`/api/seller/medicines/${id}`);
+      toast.success(`"${name}" deleted successfully`);
       fetchMedicines();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Delete failed');
+      toast.error(error.response?.data?.message || 'Failed to delete medicine');
     }
   };
 
@@ -120,27 +124,28 @@ export default function SellerMedicines() {
   return (
     <ProtectedRoute requiredRole="SELLER">
       <div className="max-w-7xl mx-auto px-4 py-8">
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            onClick={() => router.back()}
-            className="mb-6 flex items-center text-[#00B0F4] hover:text-[#00B0F4] font-medium transition-colors"
-            {...fadeInUp}
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back
-          </motion.button> 
-        <div className="flex justify-between items-center mb-8">        
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          onClick={() => router.back()}
+          className="mb-6 flex items-center text-[#00B0F4] hover:text-[#00B0F4] font-medium transition-colors"
+          {...fadeInUp}
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
+        </motion.button>
+
+        <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Medicines</h1>
-          <button 
+          <button
             onClick={() => openForm()}
             className="flex items-center justify-center bg-[#00B0F4] text-white px-6 py-3 rounded-lg cursor-pointer"
           >
             <FaPlus className="mr-2" /> Add New Medicine
           </button>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -172,7 +177,11 @@ export default function SellerMedicines() {
                     <div className="flex items-center">
                       <div className="w-12 h-12 bg-gray-200 rounded mr-4">
                         {medicine.image && (
-                          <img src={medicine.image} alt={medicine.name} className="w-full h-full object-cover rounded" />
+                          <img
+                            src={medicine.image}
+                            alt={medicine.name}
+                            className="w-full h-full object-cover rounded"
+                          />
                         )}
                       </div>
                       <div>
@@ -185,21 +194,23 @@ export default function SellerMedicines() {
                   <td className="px-6 py-4 text-sm text-gray-900">${medicine.price}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{medicine.stock}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      medicine.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        medicine.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}
+                    >
                       {medicine.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm space-x-2">
-                    <button 
+                    <button
                       onClick={() => openForm(medicine)}
                       className="text-[#00B0F4] hover:text-blue-800"
                     >
                       Edit
                     </button>
-                    <button 
-                      onClick={() => deleteMedicine(medicine.id)}
+                    <button
+                      onClick={() => deleteMedicine(medicine.id, medicine.name)}
                       className="text-red-600 hover:text-red-800"
                     >
                       Delete
@@ -210,14 +221,14 @@ export default function SellerMedicines() {
             </tbody>
           </table>
         </div>
-        
+
         {showForm && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-screen overflow-y-auto">
               <h3 className="text-lg font-semibold mb-4">
                 {editingMedicine ? 'Edit Medicine' : 'Add New Medicine'}
               </h3>
-              
+
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
@@ -227,7 +238,7 @@ export default function SellerMedicines() {
                   />
                   {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                   <textarea
@@ -235,9 +246,11 @@ export default function SellerMedicines() {
                     rows={2}
                     className="w-full p-[6px] border border-gray-300 rounded-lg"
                   />
-                  {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+                  {errors.description && (
+                    <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+                  )}
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                   <select
@@ -246,12 +259,16 @@ export default function SellerMedicines() {
                   >
                     <option value="">Select Category</option>
                     {categories.map(category => (
-                      <option key={category.id} value={category.id}>{category.name}</option>
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
                     ))}
                   </select>
-                  {errors.categoryId && <p className="text-red-500 text-sm mt-1">{errors.categoryId.message}</p>}
+                  {errors.categoryId && (
+                    <p className="text-red-500 text-sm mt-1">{errors.categoryId.message}</p>
+                  )}
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Price</label>
@@ -263,7 +280,7 @@ export default function SellerMedicines() {
                     />
                     {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Stock</label>
                     <input
@@ -274,7 +291,7 @@ export default function SellerMedicines() {
                     {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock.message}</p>}
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
                   <input
@@ -284,7 +301,7 @@ export default function SellerMedicines() {
                   />
                   {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>}
                 </div>
-                
+
                 <div className="flex space-x-4">
                   <button
                     type="button"

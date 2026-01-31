@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -80,8 +79,10 @@ export default function AdminCategories() {
     try {
       if (editingCategory) {
         await api.put(`/api/categories/${editingCategory.id}`, data);
+        toast.success('Category updated successfully');
       } else {
         await api.post('/api/categories', data);
+        toast.success('Category created successfully');
       }
       fetchCategories();
       closeForm();
@@ -90,14 +91,13 @@ export default function AdminCategories() {
     }
   };
 
-  const deleteCategory = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this category?')) return;
-    
+  const deleteCategory = async (id: string, name: string) => {
     try {
       await api.delete(`/api/categories/${id}`);
+      toast.success(`"${name}" category deleted`);
       fetchCategories();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Delete failed');
+      toast.error(error.response?.data?.message || 'Failed to delete category');
     }
   };
 
@@ -115,7 +115,7 @@ export default function AdminCategories() {
     <ProtectedRoute requiredRole="ADMIN">
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <motion.button 
+          <motion.button
             whileHover={{ scale: 1.05 }}
             onClick={() => router.back()}
             className="mb-6 flex items-center text-[#00B0F4] hover:text-[#00B0F4] font-medium transition-colors"
@@ -126,52 +126,68 @@ export default function AdminCategories() {
             </svg>
             Back
           </motion.button>
-          
+
           <motion.div className="flex justify-between items-center mb-8" {...fadeInUp}>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Category Management</h1>
               <p className="text-gray-600 mt-2">Manage medicine categories</p>
             </div>
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => openForm()}
               className="flex items-center justify-center bg-[#00B0F4] cursor-pointer text-white px-6 py-3 rounded-lg"
             >
-            <FaPlus className="mr-2" />  Add New Category
+              <FaPlus className="mr-2" /> Add New Category
             </motion.button>
           </motion.div>
-          
+
           <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" variants={staggerContainer} initial="initial" animate="animate">
             {categories.map(category => (
-              <motion.div key={category.id} variants={fadeInUp} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+              <motion.div
+                key={category.id}
+                variants={fadeInUp}
+                className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+              >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center mb-2">
                       <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
                     </div>
                     <p className="text-gray-600">{category.description || 'No description'}</p>
-                    <p className="text-sm text-gray-500 mt-2">Created: {new Date(category.createdAt).toLocaleDateString()}</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Created: {new Date(category.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                   <div className="flex space-x-2">
-                    <motion.button 
+                    <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => openForm(category)}
                       className="text-[#00B0F4] hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
                       </svg>
                     </motion.button>
-                    <motion.button 
+                    <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => deleteCategory(category.id)}
+                      onClick={() => deleteCategory(category.id, category.name)}
                       className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
                       </svg>
                     </motion.button>
                   </div>
@@ -179,12 +195,12 @@ export default function AdminCategories() {
               </motion.div>
             ))}
           </motion.div>
-          
+
           {categories.length === 0 && (
             <motion.div className="text-center py-16" {...fadeInUp}>
               <div className="text-6xl mb-4">🏷️</div>
               <p className="text-gray-600 mb-4 text-lg">No categories found</p>
-              <motion.button 
+              <motion.button
                 whileHover={{ scale: 1.05 }}
                 onClick={() => openForm()}
                 className="bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] hover:from-blue-700 hover:to-blue-700 text-white px-8 py-3 rounded-full transition-all duration-200 shadow-lg font-semibold"
@@ -193,14 +209,14 @@ export default function AdminCategories() {
               </motion.button>
             </motion.div>
           )}
-          
+
           {showForm && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
             >
-              <motion.div 
+              <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl"
@@ -208,7 +224,7 @@ export default function AdminCategories() {
                 <h3 className="text-lg font-semibold mb-4 text-gray-900">
                   {editingCategory ? 'Edit Category' : 'Add New Category'}
                 </h3>
-                
+
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
@@ -219,7 +235,7 @@ export default function AdminCategories() {
                     />
                     {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                     <textarea
@@ -228,9 +244,11 @@ export default function AdminCategories() {
                       className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#45CBFF] focus:border-[#45CBFF] transition-all"
                       placeholder="Category description (optional)"
                     />
-                    {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+                    {errors.description && (
+                      <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+                    )}
                   </div>
-                  
+
                   <div className="flex space-x-4">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
@@ -246,7 +264,11 @@ export default function AdminCategories() {
                       disabled={isSubmitting}
                       className="flex-1 bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] hover:from-blue-700 hover:to-blue-700 text-white py-2 rounded-lg transition-all duration-200 disabled:opacity-50 font-medium"
                     >
-                      {isSubmitting ? 'Saving...' : editingCategory ? 'Update' : 'Create'}
+                      {isSubmitting
+                        ? 'Saving...'
+                        : editingCategory
+                        ? 'Update'
+                        : 'Create'}
                     </motion.button>
                   </div>
                 </form>
