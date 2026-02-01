@@ -1,13 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';  // ← added useEffect & useRef
+import { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
 import { GiMedicines } from 'react-icons/gi';
 import { FaCartPlus, FaUser } from 'react-icons/fa6';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { LuLogOut } from 'react-icons/lu';
+import { MdDashboard, MdAdminPanelSettings } from 'react-icons/md';
+import { FaShoppingBag } from 'react-icons/fa';
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
@@ -17,6 +19,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const cartItemCount = getTotalItems();
 
@@ -36,7 +39,11 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showDropdown && dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (showDropdown && 
+          dropdownRef.current && 
+          !dropdownRef.current.contains(event.target as Node) &&
+          buttonRef.current &&
+          !buttonRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
       }
     };
@@ -92,6 +99,7 @@ export default function Navbar() {
           {user ? (
             <div className="relative hidden md:block">
               <button
+                ref={buttonRef}
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="flex items-center gap-2.5 hover:bg-gray-50 p-1.5 rounded-lg transition-colors"
               >
@@ -119,15 +127,47 @@ export default function Navbar() {
               {showDropdown && (
                 <div 
                   ref={dropdownRef}
-                  className="absolute right-0 mt-3 w-32 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50"
+                  className="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50"
                 >
                   <Link
                     href="/profile"
                     className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
                     onClick={() => setShowDropdown(false)}
                   >
-                    <span className="text-lg"><FaUser className="text-gray-700" /></span> Profile
+                    <FaUser className="text-gray-700" /> Profile
                   </Link>
+                  
+                  {user.role === 'CUSTOMER' && (
+                    <Link
+                      href="/orders"
+                      className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      <FaShoppingBag className="text-gray-700" /> Orders
+                    </Link>
+                  )}
+                  
+                  {user.role === 'SELLER' && (
+                    <Link
+                      href="/seller/dashboard"
+                      className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      <MdDashboard className="text-gray-700" /> Dashboard
+                    </Link>
+                  )}
+                  
+                  {user.role === 'ADMIN' && (
+                    <Link
+                      href="/admin"
+                      className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      <MdAdminPanelSettings className="text-gray-700" /> Admin
+                    </Link>
+                  )}
+                  
+                  <hr className="my-2 border-gray-200" />
                   <button
                     onClick={() => {
                       handleLogout();
@@ -135,7 +175,7 @@ export default function Navbar() {
                     }}
                     className="block w-full text-left px-5 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
                   >
-                    <span className="text-lg"><LuLogOut className="text-red-600" /></span> Logout
+                    <LuLogOut className="text-red-600" /> Logout
                   </button>
                 </div>
               )}
