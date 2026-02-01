@@ -90,6 +90,9 @@ export default function AdminOrders() {
                   Items
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Seller
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Total
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -116,6 +119,12 @@ export default function AdminOrders() {
                         </div>
                       ))}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {(() => {
+                      const sellers = [...new Set(order.orderItems?.map(item => item.medicine.seller?.name).filter(Boolean))];
+                      return sellers.length > 0 ? sellers.join(', ') : 'N/A';
+                    })()}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">${order.totalAmount.toFixed(2)}</td>
                   <td className="px-6 py-4">

@@ -65,6 +65,11 @@ export interface AdminOrder {
       id: string;
       name: string;
       price: number;
+      seller?: {
+        id: string;
+        name: string;
+        email: string;
+      };
     };
     quantity: number;
     price: number;
