@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { FaHospital, FaTruck, FaPills } from 'react-icons/fa6';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -45,7 +46,7 @@ export default function About() {
         <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16" {...fadeInUp}>
           <div className="bg-white rounded-xl p-8 shadow-lg text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">🏥</span>
+              <FaHospital className="text-2xl text-[#00B0F4]" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Trusted Sellers</h3>
             <p className="text-gray-600">All our sellers are verified and licensed pharmaceutical providers.</p>
@@ -53,7 +54,7 @@ export default function About() {
           
           <div className="bg-white rounded-xl p-8 shadow-lg text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">🚚</span>
+              <FaTruck className="text-2xl text-[#00B0F4]" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Fast Delivery</h3>
             <p className="text-gray-600">Quick and secure delivery of your medications to your doorstep.</p>
@@ -61,7 +62,7 @@ export default function About() {
           
           <div className="bg-white rounded-xl p-8 shadow-lg text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">💊</span>
+              <FaPills className="text-2xl text-[#00B0F4]" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Quality Assured</h3>
             <p className="text-gray-600">All medications are sourced from licensed manufacturers and distributors.</p>
