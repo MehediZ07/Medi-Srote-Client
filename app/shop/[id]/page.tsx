@@ -59,8 +59,11 @@ export default function MedicineDetail({ params }: Props) {
   };
 
   const addToCart = () => {
-    if (!user) return router.push('/login');
-    if (user.role !== 'CUSTOMER') return toast.error('Only customers can add to cart');
+    if (!user) {
+      localStorage.setItem('redirectAfterLogin', window.location.pathname);
+      return router.push('/login');
+    }
+    if (user.role !== 'CUSTOMER') return;
     if (!medicine) return;
 
     setAddingToCart(true);
@@ -172,7 +175,7 @@ export default function MedicineDetail({ params }: Props) {
               </div>
             </div>
 
-            {medicine.stock > 0 && (
+            {medicine.stock > 0 && (!user || user?.role === 'CUSTOMER') && (
               <div className="flex items-center gap-4">
                 <span className="font-medium">Quantity</span>
                 <input
@@ -186,29 +189,31 @@ export default function MedicineDetail({ params }: Props) {
               </div>
             )}
 
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={addToCart}
-              disabled={medicine.stock === 0 || addingToCart}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] 
-                         text-white font-semibold shadow-lg disabled:opacity-50
-                         flex items-center justify-center gap-3"
-            >
-              {addingToCart ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Adding...
-                </>
-              ) : medicine.stock === 0 ? (
-                'Out of Stock'
-              ) : (
-                <>
-                  <FaCartPlus className="text-xl" />
-                  Add to Cart
-                </>
-              )}
-            </motion.button>
+            {(!user || user?.role === 'CUSTOMER') && (
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={addToCart}
+                disabled={medicine.stock === 0 || addingToCart}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] 
+                           text-white font-semibold shadow-lg disabled:opacity-50
+                           flex items-center justify-center gap-3"
+              >
+                {addingToCart ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                    Adding...
+                  </>
+                ) : medicine.stock === 0 ? (
+                  'Out of Stock'
+                ) : (
+                  <>
+                    <FaCartPlus className="text-xl" />
+                    Add to Cart
+                  </>
+                )}
+              </motion.button>
+            )}
           </motion.div>
         </div>
 

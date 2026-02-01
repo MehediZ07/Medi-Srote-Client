@@ -7,6 +7,7 @@ import api from '../../lib/api';
 import { Medicine, Category, MedicinesResponse } from '../../types/api';
 import Link from 'next/link';
 import { useCartStore } from '../../store/cartStore';
+import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 import { FaCartPlus } from 'react-icons/fa6';
 
@@ -34,6 +35,7 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { addItem } = useCartStore();
+  const { user } = useAuthStore();
   
   const [filters, setFilters] = useState({
     search: searchParams.get('search') || '',
@@ -108,6 +110,12 @@ function ShopContent() {
   };
 
   const handleAddToCart = (medicine: Medicine) => {
+    if (!user) {
+      localStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
+      router.push('/login');
+      return;
+    }
+    
     if (medicine.stock <= 0) {
       toast.error('This medicine is out of stock');
       return;
@@ -254,25 +262,40 @@ function ShopContent() {
                     </div>
                       
                     <div className="flex space-x-2">
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => handleAddToCart(medicine)}
-                        disabled={medicine.stock <= 0}
-                        className="flex-1 flex gap-1 items-center justify-center space-x-1 border border-[#00B0F4] text-[#00B0F4] py-2 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <FaCartPlus size={16} />
-                        <span>Add</span>
-                      </motion.button>
+                      {(!user || user?.role === 'CUSTOMER') && (
+                        <>
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => handleAddToCart(medicine)}
+                            disabled={medicine.stock <= 0}
+                            className="flex-1 flex gap-1 items-center justify-center space-x-1 border border-[#00B0F4] text-[#00B0F4] py-2 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <FaCartPlus size={16} />
+                            <span>Add</span>
+                          </motion.button>
+                          
+                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className="flex-1">
+                            <Link
+                              href={`/shop/${medicine.id}`}
+                              className="block w-full text-center bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] text-white py-2.5 rounded-lg font-semibold transition-all shadow-sm"
+                            >
+                              View Details
+                            </Link>
+                          </motion.div>
+                        </>
+                      )}
                       
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className="flex-1">
-                        <Link
-                          href={`/shop/${medicine.id}`}
-                          className="block w-full text-center bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] text-white py-2.5 rounded-lg font-semibold transition-all shadow-sm"
-                        >
-                          View Details
-                        </Link>
-                      </motion.div>
+                      {(user?.role === 'ADMIN' || user?.role === 'SELLER') && (
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className="w-full">
+                          <Link
+                            href={`/shop/${medicine.id}`}
+                            className="block w-full text-center bg-gradient-to-r from-[#00B0F4] to-[#00B0F4] text-white py-2.5 rounded-lg font-semibold transition-all shadow-sm"
+                          >
+                            View Details
+                          </Link>
+                        </motion.div>
+                      )}
                     </div>
                   </div>
                 </div>

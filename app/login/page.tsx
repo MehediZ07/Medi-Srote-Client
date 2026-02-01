@@ -53,11 +53,19 @@ export default function Login() {
       setUser(user);
       
       toast.success('Welcome back! Login successful.');
+      setTimeout(() => {
+        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        if (redirectUrl) {
+          localStorage.removeItem('redirectAfterLogin');
+          router.push(redirectUrl);
+          return;
+        }
 
-      const role = user.role;
-      if (role === 'CUSTOMER') router.push('/shop');
-      else if (role === 'SELLER') router.push('/seller/dashboard');
-      else if (role === 'ADMIN') router.push('/admin');
+        const role = user.role;
+        if (role === 'CUSTOMER') router.push('/shop');
+        else if (role === 'SELLER') router.push('/seller/dashboard');
+        else if (role === 'ADMIN') router.push('/admin');
+      }, 100);
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Login failed. Please try again.');
     }
