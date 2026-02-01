@@ -35,8 +35,14 @@ MediStore is a modern e-commerce platform specifically designed for pharmaceutic
 - **Average Rating Display**: Aggregate ratings for informed purchasing decisions
 - **Review Management**: Moderation tools for quality control
 
+### Error Handling & User Experience
+- **Custom 404 Page**: Branded not-found page with navigation options
+- **Global Error Boundary**: Graceful error handling with recovery options
+- **Loading States**: Consistent loading indicators across the application
+- **Toast Notifications**: Real-time feedback for user actions
+- **Responsive Design**: Mobile-first approach with seamless cross-device experience
+
 ### Security & Authentication
-- **Email Verification**: Secure account activation process
 - **Role-Based Access Control**: Granular permissions for different user types
 - **Secure Session Management**: HTTP-only cookies for authentication
 - **Input Validation**: Comprehensive form validation and sanitization
@@ -86,6 +92,9 @@ MediStoreFrontend/
 │   │   └── orders/               # Seller order management
 │   ├── shop/                     # Medicine catalog
 │   │   └── [id]/                 # Medicine details
+│   ├── error.tsx                 # Global error boundary
+│   ├── loading.tsx               # Global loading component
+│   ├── not-found.tsx             # Custom 404 page
 │   ├── favicon.ico               # Custom favicon
 │   ├── globals.css               # Global styles
 │   ├── layout.tsx                # Root layout
@@ -195,61 +204,8 @@ npm run lint     # Run ESLint
 3. **Category Management**: Create and manage medicine categories
 4. **System Analytics**: Platform-wide metrics and insights
 
-## API Integration
 
-### Base Configuration
-```typescript
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
-  withCredentials: true,
-});
-```
 
-### Key Endpoints
-- **Authentication**: `/api/auth/*`
-- **Medicines**: `/api/medicines/*`
-- **Orders**: `/api/orders/*`
-- **Reviews**: `/api/reviews/*`
-- **Categories**: `/api/categories/*`
-- **Seller Operations**: `/api/seller/*`
-- **Admin Functions**: `/api/admin/*`
-
-## State Management
-
-### Authentication Store
-```typescript
-interface AuthState {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  logout: () => Promise<boolean>;
-}
-```
-
-### Cart Store
-```typescript
-interface CartState {
-  items: CartItem[];
-  addItem: (item: CartItem) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
-  clearCart: () => void;
-  getTotalItems: () => number;
-  getTotalPrice: () => number;
-}
-```
-
-## Form Validation
-
-All forms use Zod schemas for validation:
-
-```typescript
-// Registration validation
-const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['CUSTOMER', 'SELLER']),
-});
 ```
 
 ## Deployment
@@ -270,8 +226,22 @@ The application is automatically deployed to Vercel with:
 - Serverless functions
 - Environment variable management
 
+## Error Handling & User Experience
+
+### Custom Error Pages
+- **404 Not Found**: Branded error page with navigation back to home or shop
+- **Global Error Boundary**: Catches JavaScript errors and provides recovery options
+- **Loading States**: Consistent loading spinners and skeleton screens
+
+### Error Recovery
+- **Try Again**: Users can retry failed operations
+- **Navigation Options**: Clear paths back to working sections
+- **Error Logging**: Automatic error reporting for debugging
+
 ## Performance Optimizations
 
+- **Error Boundaries**: Global error handling with graceful fallbacks
+- **Loading States**: Optimized loading indicators and skeleton screens
 - **Server Components**: Reduced client-side JavaScript
 - **Image Optimization**: Next.js automatic image optimization
 - **Code Splitting**: Route-based code splitting
@@ -284,8 +254,7 @@ The application is automatically deployed to Vercel with:
 - **XSS Prevention**: Sanitized user content
 - **CSRF Protection**: Token-based protection
 - **Secure Authentication**: HTTP-only cookies
-- **Role-Based Access**: Server-side authorization
-- **Email Verification**: Account activation required
+- **Role-Based Access**: Server-side
 
 ## Browser Support
 
@@ -293,33 +262,3 @@ The application is automatically deployed to Vercel with:
 - Firefox 88+
 - Safari 14+
 - Edge 90+
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-feature`
-3. Commit changes: `git commit -am 'Add new feature'`
-4. Push to branch: `git push origin feature/new-feature`
-5. Submit a pull request
-
-### Code Standards
-- TypeScript for type safety
-- ESLint for code quality
-- Conventional commit messages
-- Component-based architecture
-- Responsive design principles
-
-## License
-
-This project is licensed under the MIT License.
-
-## Support
-
-For support and questions:
-- Create an issue in the repository
-- Contact the development team
-- Check the documentation in `/docs`
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for version history and updates.

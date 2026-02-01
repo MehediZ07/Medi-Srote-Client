@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { FiShoppingBag, FiUser } from 'react-icons/fi';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 import api from '../../../lib/api';
 import { Order } from '../../../types/orders';
@@ -257,7 +258,7 @@ export default function OrderDetail({ params }: Props) {
                   </div>
                 )}
                 
-                {order.status === 'PLACED' && (
+                {order.status === 'PLACED' && (!order.childOrders || order.childOrders.every(child => child.status === 'PLACED')) && (
                   <div className="mt-4 pt-4 border-t">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -284,9 +285,30 @@ export default function OrderDetail({ params }: Props) {
             <motion.div {...fadeInUp}>
               <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border border-gray-100">
                 <h3 className="text-lg font-semibold mb-4 text-gray-900">Order Status</h3>
-                <span className={`px-4 py-2 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-                  {order.status}
-                </span>
+                
+                {order.childOrders && order.childOrders.length > 0 ? (
+                  <div className="space-y-3">
+                    {order.childOrders.map((childOrder, index) => (
+                      <div key={childOrder.id} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                            <FiUser className="text-green-600" size={12} />
+                          </div>
+                          <span className="text-gray-700">{childOrder.seller.name}</span>
+                        </div>
+                                          
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(childOrder.status)}`}>
+                          {childOrder.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+                    {order.status}
+                  </span>
+                )}
+                
                 <p className="text-gray-600 mt-3">
                   Placed on {new Date(order.createdAt).toLocaleDateString()}
                 </p>
