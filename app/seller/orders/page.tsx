@@ -1,161 +1,125 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import ProtectedRoute from '../../../components/ProtectedRoute';
+import DashboardLayout from '../../../components/dashboard/DashboardLayout';
+import Pagination from '../../../components/dashboard/Pagination';
 import api from '../../../lib/api';
 import { SellerOrder } from '../../../types/seller';
-import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { MdDashboard } from 'react-icons/md';
+import { FaBox, FaPills, FaUser } from 'react-icons/fa6';
+
+const NAV_ITEMS = [
+  { href: '/seller/dashboard', label: 'Dashboard', icon: <MdDashboard size={18} /> },
+  { href: '/seller/medicines', label: 'Medicines', icon: <FaPills size={16} /> },
+  { href: '/seller/orders', label: 'Orders', icon: <FaBox size={16} /> },
+  { href: '/profile', label: 'Profile', icon: <FaUser size={16} /> },
+];
+
+const STATUS_COLORS: Record<string, string> = {
+  DELIVERED: 'bg-emerald-100 text-emerald-700',
+  SHIPPED: 'bg-blue-100 text-blue-700',
+  PROCESSING: 'bg-yellow-100 text-yellow-700',
+  PLACED: 'bg-gray-100 text-gray-700',
+  CANCELLED: 'bg-red-100 text-red-700',
+};
+
+const PER_PAGE = 8;
 
 export default function SellerOrders() {
   const [orders, setOrders] = useState<SellerOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
 
-  const fadeInUp = {
-  initial: { opacity: 0, y: 60 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
-};
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  useEffect(() => { fetchOrders(); }, []);
 
   const fetchOrders = async () => {
-    try {
-      const response = await api.get('/api/seller/orders');
-      setOrders(response.data.data);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-    } finally {
-      setLoading(false);
-    }
+    try { const r = await api.get('/api/seller/orders'); setOrders(r.data.data); }
+    catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
-  const updateOrderStatus = async (orderId: string, status: string) => {
-    try {
-      await api.patch(`/api/seller/orders/${orderId}/status`, { status });
-      fetchOrders();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update status');
-    }
+  const updateStatus = async (id: string, status: string) => {
+    try { await api.patch(`/api/seller/orders/${id}/status`, { status }); fetchOrders(); }
+    catch (e: any) { toast.error(e.response?.data?.message || 'Failed to update status'); }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'DELIVERED': return 'bg-green-100 text-green-800';
-      case 'SHIPPED': return 'bg-blue-100 text-blue-800';
-      case 'PROCESSING': return 'bg-yellow-100 text-yellow-800';
-      case 'PENDING': return 'bg-gray-100 text-gray-800';
-      case 'CANCELLED': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const filtered = orders.filter(o => o.customer.name.toLowerCase().includes(search.toLowerCase()));
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const handleSearch = (val: string) => { setSearch(val); setPage(1); };
 
-  if (loading) {
-    return (
-      <ProtectedRoute requiredRole="SELLER">
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00B0F4]"></div>
-        </div>
-      </ProtectedRoute>
-    );
-  }
+  if (loading) return (
+    <ProtectedRoute requiredRole="SELLER">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-10 h-10 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    </ProtectedRoute>
+  );
 
   return (
     <ProtectedRoute requiredRole="SELLER">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <motion.button 
-            whileHover={{ scale: 1.05 }}
-            onClick={() => router.back()}
-            className="mb-6 flex items-center text-[#00B0F4] hover:text-[#00B0F4] font-medium transition-colors"
-            {...fadeInUp}
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back
-          </motion.button>
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Orders</h1>
-        
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Order ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Customer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Items
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Total
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {orders.map(order => (
-                <tr key={order.id}>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">#{order.id.slice(-8)}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{order.customer.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    <div>
-                      {order.orderItems?.map(item => (
-                        <div key={item.id} className="text-xs">
-                          {item.medicine.name} x{item.quantity}
-                        </div>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">${order.totalAmount.toFixed(2)}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(order.status)}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <select
-                      value={order.status}
-                      onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                      className="text-sm border rounded px-2 py-1"
-                      disabled={order.status === 'DELIVERED' || order.status === 'CANCELLED'}
-                    >
-                      <option value="PLACED">Placed</option>
-                      <option value="PROCESSING">Processing</option>
-                      <option value="SHIPPED">Shipped</option>
-                      <option value="DELIVERED">Delivered</option>
-                      <option value="CANCELLED">Cancelled</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          
-          {orders.length === 0 && (
-            <div className="text-center py-8 text-gray-600">
-              No orders found
+      <DashboardLayout title="Orders" navItems={NAV_ITEMS} role="SELLER" roleLabel="Seller">
+        <div className="space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <p className="text-sm text-gray-500 dark:text-gray-400">{filtered.length} orders</p>
+            <input type="text" placeholder="Search by customer..." value={search} onChange={e => handleSearch(e.target.value)}
+              className="w-full sm:w-56 px-4 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400" />
+          </div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 dark:bg-slate-700 border-b border-gray-100 dark:border-slate-600">
+                  <tr>
+                    {['Order', 'Customer', 'Items', 'Total', 'Status', 'Date', 'Update'].map(h => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50 dark:divide-slate-700">
+                  {paginated.map(order => (
+                    <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                      <td className="px-4 py-3 font-mono text-xs text-gray-500 dark:text-gray-400">#{order.id.slice(-8)}</td>
+                      <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{order.customer.name}</td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
+                        {order.orderItems?.map(item => (
+                          <div key={item.id} className="text-xs">{item.medicine.name} ×{item.quantity}</div>
+                        ))}
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-gray-900 dark:text-white">${order.totalAmount.toFixed(2)}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_COLORS[order.status] || 'bg-gray-100 text-gray-700'}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs">{new Date(order.createdAt).toLocaleDateString()}</td>
+                      <td className="px-4 py-3">
+                        <select value={order.status} onChange={e => updateStatus(order.id, e.target.value)}
+                          disabled={order.status === 'DELIVERED' || order.status === 'CANCELLED'}
+                          className="text-xs border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                          <option value="PLACED">Placed</option>
+                          <option value="PROCESSING">Processing</option>
+                          <option value="SHIPPED">Shipped</option>
+                          <option value="DELIVERED">Delivered</option>
+                          <option value="CANCELLED">Cancelled</option>
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
+            {filtered.length === 0 && <div className="text-center py-12 text-gray-400 dark:text-gray-500 text-sm">No orders found</div>}
+            <div className="px-4 pb-4">
+              <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} totalItems={filtered.length} itemsPerPage={PER_PAGE} />
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </DashboardLayout>
     </ProtectedRoute>
   );
 }

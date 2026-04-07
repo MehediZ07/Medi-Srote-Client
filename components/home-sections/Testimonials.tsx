@@ -3,20 +3,26 @@
 import Marquee from "react-fast-marquee";
 import TestimonialCard from "./TestimonialCard";
 import { testimonials } from "../../data/testimonials";
-export default function Testimonials() {
-  return (
-    <section className="bg-white max-w-[1200px] mx-auto py-8 overflow-hidden section-fade-x">
-      <h2 className="text-center text-3xl md:text-4xl font-semibold text-gray-800 mb-16">
-        What Our Customers Say About Us
-      </h2>
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
-      <Marquee
-        speed={40}
-        pauseOnHover
-        gradient
-        gradientColor="255,255,255"
-        gradientWidth={120}
-      >
+export default function Testimonials() {
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const gradientColor = mounted && theme === "dark" ? "15,23,42" : "255,255,255";
+
+  return (
+    <section className="bg-white dark:bg-slate-900 py-24 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-14">
+          <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-sm uppercase tracking-widest">What People Say</span>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mt-2">What Our Customers Say</h2>
+        </div>
+      </div>
+
+      <Marquee speed={40} pauseOnHover gradient gradientColor={gradientColor} gradientWidth={120}>
         {testimonials.map((item, idx) => (
           <TestimonialCard key={idx} {...item} />
         ))}
@@ -24,37 +30,11 @@ export default function Testimonials() {
 
       <div className="h-8" />
 
-      <Marquee
-        speed={40}
-        direction="right"
-        pauseOnHover
-        gradient
-        gradientColor="255,255,255"
-        gradientWidth={120}
-      >
+      <Marquee speed={40} direction="right" pauseOnHover gradient gradientColor={gradientColor} gradientWidth={120}>
         {testimonials.map((item, idx) => (
           <TestimonialCard key={`reverse-${idx}`} {...item} />
         ))}
       </Marquee>
-
-      <style jsx>{`
-        .section-fade-x {
-          -webkit-mask-image: linear-gradient(
-            to right,
-            transparent 0%,
-            white 20%,
-            white 80%,
-            transparent 100%
-          );
-          mask-image: linear-gradient(
-            to right,
-            transparent 0%,
-            white 20%,
-            white 80%,
-            transparent 100%
-          );
-        }
-      `}</style>
     </section>
   );
 }

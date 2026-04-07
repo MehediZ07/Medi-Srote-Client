@@ -6,6 +6,14 @@ A comprehensive online pharmacy platform built with Next.js, featuring role-base
 
 **Production URL**: https://medistore-frontend.vercel.app
 
+## Screenshots
+
+### Home Page
+![MediStore Home Page](./Home.jpeg)
+
+### Dashboard
+![MediStore Dashboard](./Dashboard.jpeg)
+
 ## Overview
 
 MediStore is a modern e-commerce platform specifically designed for pharmaceutical products. It connects customers with verified sellers, providing a secure and convenient way to purchase medicines online. The platform features a sophisticated multi-seller order system, comprehensive admin dashboard, and seller management tools.
