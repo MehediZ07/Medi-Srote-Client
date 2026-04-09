@@ -9,21 +9,12 @@ interface Message {
   content: string;
 }
 
-const SYSTEM_PROMPT = `You are MediBot, a helpful AI assistant for MediStore — an online pharmacy platform. 
-You help customers with:
-- Finding medicines and health products
-- Understanding medicine categories (Pain Relief, Antibiotics, Vitamins, Cold & Flu, Digestive Health, Heart Health, Diabetes Care, Skin Care)
-- Order tracking and delivery questions
-- General health and medication FAQs
-- How to use the MediStore platform
-
-Keep responses concise, friendly, and helpful. Always recommend consulting a doctor for medical advice.
-Do not provide specific medical diagnoses or prescribe medications.`;
+const SUGGESTIONS = ['Find medicines', 'Track my order', 'Pain relief options', 'How to register?'];
 
 export default function AIChatbot() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hi! I\'m MediBot 👋 How can I help you today? I can assist with finding medicines, order questions, or general health info.' }
+    { role: 'assistant', content: "Hi! I'm MediBot 👋 How can I help you today? I can assist with finding medicines, order questions, or general health info." },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,41 +24,29 @@ export default function AIChatbot() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  const sendMessage = async () => {
-    const text = input.trim();
-    if (!text || loading) return;
+  const sendMessage = async (text?: string) => {
+    const trimmed = (text ?? input).trim();
+    if (!trimmed || loading) return;
 
-    const userMsg: Message = { role: 'user', content: text };
-    setMessages(prev => [...prev, userMsg]);
+    const userMsg: Message = { role: 'user', content: trimmed };
+    const updated = [...messages, userMsg];
+    setMessages(updated);
     setInput('');
     setLoading(true);
 
     try {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Authorization': 'Bearer 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',
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://medistore-frontend.vercel.app',
-          'X-Title': 'MediStore AI Assistant',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'meta-llama/llama-3.1-8b-instruct:free',
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            ...messages.slice(-6),
-            userMsg,
-          ],
-          max_tokens: 300,
-          temperature: 0.7,
+          messages: updated.map(m => ({ role: m.role, content: m.content })),
         }),
       });
-
-      const data = await response.json();
-      const reply = data.choices?.[0]?.message?.content || 'Sorry, I couldn\'t process that. Please try again.';
+      const data = await res.json();
+      const reply = data.reply ?? "Sorry, something went wrong. Please try again.";
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I\'m having trouble connecting. Please try again later.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Please check your internet and try again.' }]);
     } finally {
       setLoading(false);
     }
@@ -79,7 +58,6 @@ export default function AIChatbot() {
 
   return (
     <>
-      {/* Floating button */}
       <motion.button
         onClick={() => setOpen(true)}
         whileHover={{ scale: 1.1 }}
@@ -90,7 +68,6 @@ export default function AIChatbot() {
         <FaRobot size={22} />
       </motion.button>
 
-      {/* Chat window */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -108,7 +85,10 @@ export default function AIChatbot() {
                 </div>
                 <div>
                   <p className="text-white font-semibold text-sm">MediBot</p>
-                  <p className="text-emerald-100 text-xs">AI Health Assistant</p>
+                  <p className="text-emerald-100 text-xs flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 inline-block" />
+                    Online
+                  </p>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white transition-colors p-1">
@@ -125,7 +105,7 @@ export default function AIChatbot() {
                       <FaRobot size={11} className="text-emerald-600 dark:text-emerald-400" />
                     </div>
                   )}
-                  <div className={`max-w-[78%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                  <div className={`max-w-[78%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${
                     msg.role === 'user'
                       ? 'bg-emerald-600 text-white rounded-br-sm'
                       : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-sm'
@@ -134,13 +114,16 @@ export default function AIChatbot() {
                   </div>
                 </div>
               ))}
+
               {loading && (
                 <div className="flex justify-start">
                   <div className="w-6 h-6 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
                     <FaRobot size={11} className="text-emerald-600" />
                   </div>
-                  <div className="bg-gray-100 dark:bg-slate-700 px-4 py-3 rounded-2xl rounded-bl-sm">
-                    <FaSpinner size={14} className="text-gray-400 animate-spin" />
+                  <div className="bg-gray-100 dark:bg-slate-700 px-4 py-3 rounded-2xl rounded-bl-sm flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               )}
@@ -150,8 +133,8 @@ export default function AIChatbot() {
             {/* Quick suggestions */}
             {messages.length === 1 && (
               <div className="px-4 pb-2 flex gap-2 flex-wrap">
-                {['Find medicines', 'Track my order', 'Pain relief options'].map(s => (
-                  <button key={s} onClick={() => { setInput(s); }}
+                {SUGGESTIONS.map(s => (
+                  <button key={s} onClick={() => sendMessage(s)}
                     className="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 px-3 py-1.5 rounded-full hover:bg-emerald-100 transition-colors">
                     {s}
                   </button>
@@ -166,14 +149,15 @@ export default function AIChatbot() {
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={handleKey}
                 placeholder="Ask MediBot anything..."
+                disabled={loading}
                 className="flex-1 px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:focus:ring-emerald-700 text-gray-900 dark:text-gray-100 placeholder-gray-400"
               />
               <button
-                onClick={sendMessage}
+                onClick={() => sendMessage()}
                 disabled={!input.trim() || loading}
                 className="w-10 h-10 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
               >
-                <FaPaperPlane size={13} />
+                {loading ? <FaSpinner size={13} className="animate-spin" /> : <FaPaperPlane size={13} />}
               </button>
             </div>
           </motion.div>

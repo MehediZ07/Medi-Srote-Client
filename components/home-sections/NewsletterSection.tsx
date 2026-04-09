@@ -38,7 +38,7 @@ export default function NewsletterSection() {
             Get the latest health tips, medicine updates, and exclusive offers delivered to your inbox.
           </p>
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <div className="flex-1 relative">
+            <div className="flex-1 relative" suppressHydrationWarning>
               <FaEnvelope size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="email"

@@ -2,10 +2,10 @@
 
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import { FaSun, FaMoon } from 'react-icons/fa6';
+import { Sun, Moon } from 'lucide-react';
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -14,14 +14,11 @@ export default function ThemeToggle() {
 
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
-      aria-label="Toggle dark mode"
+      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+      className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+      aria-label="Toggle theme"
     >
-      {theme === 'dark'
-        ? <FaSun size={15} className="text-amber-400" />
-        : <FaMoon size={15} className="text-slate-600" />
-      }
+      {resolvedTheme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </button>
   );
 }

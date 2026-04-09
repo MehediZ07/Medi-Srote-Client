@@ -1,12 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'https://medi-store-backend-sigma.vercel.app/api/:path*',
-      },
-    ];
+    return {
+      beforeFiles: [],
+      afterFiles: [
+        {
+          source: '/api/:path*',
+          destination: 'https://medi-store-backend-sigma.vercel.app/api/:path*',
+        },
+      ],
+      fallback: [],
+    };
   },
 };
 
